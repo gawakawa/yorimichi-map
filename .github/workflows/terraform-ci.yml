@@ -1,19 +1,26 @@
-name: "CI"
+name: "Terraform CI"
 
 on:
   pull_request:
+    paths:
+      - "terraform/**"
   push:
     branches:
       - main
+    paths:
+      - "terraform/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: CI
+  tests:
+    name: Build and Test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -23,16 +30,5 @@ jobs:
         with:
           github_access_token: ${{ secrets.GH_TOKEN }}
 
-      - name: Format check
-        run: nix fmt -- --ci
-
-      - name: Install dependencies
-        run: | 
-          nix profile add .#ci
-          pnpm install
-
-      - name: Lint and type check
-        run: pnpm lint
-
-      - name: Run tests
-        run: pnpm test
+      - name: Flake check
+        run: nix flake check

@@ -1,0 +1,45 @@
+name: "Frontend CI"
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Format check
+        run: nix fmt -- --ci
+
+      - name: Install dependencies
+        run: |
+          nix profile add .#ci
+          pnpm install
+
+      - name: Lint and type check
+        run: pnpm lint
+
+      - name: Run tests
+        run: pnpm test
