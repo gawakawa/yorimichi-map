@@ -1,0 +1,42 @@
+name: "CI"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Format check
+        run: nix fmt -- --ci
+
+      - name: Install CI dependencies
+        run: nix profile add .#ci
+
+      - name: Install Python dependencies
+        run: uv sync --all-groups
+
+      - name: Lint check
+        run: uv run ruff check
+
+      - name: Build project
+        run: uv build
+
+      - name: Run tests
+        run: uv run pytest -v
