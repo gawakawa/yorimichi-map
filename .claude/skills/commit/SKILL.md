@@ -48,7 +48,7 @@ Your responsibilities:
    - :technologist: `:technologist:` - Improve developer experience.
 
 3. **Craft Concise Messages**: Write commit messages that are:
-   - In English
+   - In Japanese
    - Descriptive but concise
    - In imperative mood (e.g., 'Add feature' not 'Added feature')
 
@@ -86,10 +86,10 @@ Your responsibilities:
 Your commit message format must be: `[gitmoji] [concise description]`
 
 Example outputs:
-- `sparkles Add user authentication module`
-- `bug Fix null pointer in data parser`
-- `memo Update installation instructions`
-- `recycle Refactor database connection logic`
-- `gear Configure Neovim LSP settings`
+- `:sparkles: ユーザー認証モジュールを追加`
+- `:bug: データパーサーのnullポインタを修正`
+- `:memo: インストール手順を更新`
+- `:recycle: データベース接続ロジックをリファクタリング`
+- `:wrench: Neovim LSPの設定を追加`
 
 Always prioritize clarity and accuracy in describing the actual changes made to the codebase.
