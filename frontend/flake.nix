@@ -29,13 +29,54 @@
       perSystem =
         {
           config,
-          inputs,
+          inputs',
           pkgs,
           system,
           ...
         }:
         let
-          inherit (inputs.nix2container.packages.${system}) nix2container;
+          inherit (inputs'.nix2container.packages) nix2container;
+          inherit (pkgs) buildNpmPackage importNpmLock;
+
+          frontend = buildNpmPackage {
+            pname = "yorimichi-map-frontend";
+            version = "0.1.0";
+            src = ./.;
+
+            npmDeps = importNpmLock { npmRoot = ./.; };
+            inherit (importNpmLock) npmConfigHook;
+
+            installPhase = ''
+              runHook preInstall
+              cp -r dist $out
+              runHook postInstall
+            '';
+          };
+
+          nginxConf =
+            (import (pkgs.path + "/nixos/lib/eval-config.nix") {
+              inherit system;
+              modules = [
+                {
+                  nixpkgs.hostPlatform = system;
+                  system.stateVersion = "24.11";
+                  services.nginx = {
+                    enable = true;
+                    enableReload = true;
+                    virtualHosts."localhost" = {
+                      listen = [
+                        {
+                          addr = "0.0.0.0";
+                          port = 8080;
+                        }
+                      ];
+                      root = "/dist";
+                      locations."/".tryFiles = "$uri $uri/ /index.html";
+                    };
+                  };
+                }
+              ];
+            }).config.environment.etc."nginx/nginx.conf".source;
 
           ciPackages = with pkgs; [
             pnpm
@@ -63,10 +104,27 @@
               paths = ciPackages;
             };
 
+            inherit frontend;
+
             container = nix2container.buildImage {
               name = "yorimichi-map-frontend";
+              copyToRoot = pkgs.buildEnv {
+                name = "root";
+                paths = [
+                  frontend
+                  pkgs.nginx
+                ];
+                pathsToLink = [ "/" ];
+              };
               config = {
-                entrypoint = [ "${pkgs.hello}/bin/hello" ];
+                Cmd = [
+                  "${pkgs.nginx}/bin/nginx"
+                  "-c"
+                  nginxConf
+                ];
+                ExposedPorts = {
+                  "8080/tcp" = { };
+                };
               };
             };
           };
