@@ -7,6 +7,10 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -25,10 +29,14 @@
       perSystem =
         {
           config,
+          inputs,
           pkgs,
+          system,
           ...
         }:
         let
+          inherit (inputs.nix2container.packages.${system}) nix2container;
+
           ciPackages = with pkgs; [
             pnpm
             nodejs_24
@@ -53,6 +61,13 @@
             ci = pkgs.buildEnv {
               name = "ci";
               paths = ciPackages;
+            };
+
+            container = nix2container.buildImage {
+              name = "yorimichi-map-frontend";
+              config = {
+                entrypoint = [ "${pkgs.hello}/bin/hello" ];
+              };
             };
           };
 
