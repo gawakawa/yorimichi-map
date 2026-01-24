@@ -17,14 +17,18 @@
     };
     uv2nix = {
       url = "github:pyproject-nix/uv2nix";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        pyproject-nix.follows = "pyproject-nix";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     pyproject-build-systems = {
       url = "github:pyproject-nix/build-system-pkgs";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.uv2nix.follows = "uv2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        pyproject-nix.follows = "pyproject-nix";
+        uv2nix.follows = "uv2nix";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
   };
 
@@ -79,27 +83,62 @@
 
           editablePythonSet = pythonSet.overrideScope editableOverlay;
 
-          virtualenv = editablePythonSet.mkVirtualEnv "yorimichi-map-backend-dev-env" workspaceConfig.deps.all;
+          devVirtualenv = editablePythonSet.mkVirtualEnv "yorimichi-map-backend-dev-env" workspaceConfig.deps.all;
+
+          prodVirtualenv = pythonSet.mkVirtualEnv "yorimichi-map-backend-env" workspaceConfig.deps.default;
+
+          backendSrc = pkgs.stdenv.mkDerivation {
+            name = "yorimichi-map-backend-src";
+            src = lib.fileset.toSource {
+              root = ./.;
+              fileset = lib.fileset.unions [
+                ./yorimichi_map_backend
+                ./manage.py
+              ];
+            };
+            phases = [ "installPhase" ];
+            installPhase = ''
+              mkdir -p $out
+              cp -r $src/* $out/
+            '';
+          };
 
           ciPackages = [
             pkgs.uv
           ];
 
-          devPackages =
-            ciPackages
-            ++ config.pre-commit.settings.enabledPackages;
+          devPackages = ciPackages ++ config.pre-commit.settings.enabledPackages;
         in
         {
           packages = {
             ci = pkgs.buildEnv {
               name = "ci";
-              paths = ciPackages ++ [ virtualenv ];
+              paths = ciPackages ++ [ devVirtualenv ];
             };
 
             container = nix2container.buildImage {
               name = "yorimichi-map-backend";
+              copyToRoot = pkgs.buildEnv {
+                name = "root";
+                paths = [
+                  prodVirtualenv
+                  backendSrc
+                ];
+                pathsToLink = [ "/" ];
+              };
               config = {
-                entrypoint = [ "${pkgs.hello}/bin/hello" ];
+                Cmd = [
+                  "${lib.getExe' prodVirtualenv "gunicorn"}"
+                  "--bind"
+                  "0.0.0.0:8000"
+                  "--workers"
+                  "2"
+                  "yorimichi_map_backend.wsgi"
+                ];
+                WorkingDir = "${backendSrc}";
+                ExposedPorts = {
+                  "8000/tcp" = { };
+                };
               };
             };
           };
@@ -118,8 +157,9 @@
 
           devShells.default = pkgs.mkShell {
             packages = [
-              virtualenv
-            ] ++ devPackages;
+              devVirtualenv
+            ]
+            ++ devPackages;
 
             env = {
               UV_NO_SYNC = "1";

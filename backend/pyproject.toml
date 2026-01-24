@@ -9,6 +9,7 @@ dependencies = [
     "django-cors-headers>=4.9.0",
     "djangorestframework>=3.16.1",
     "drf-spectacular>=0.29.0",
+    "gunicorn>=23.0.0",
 ]
 
 [dependency-groups]
