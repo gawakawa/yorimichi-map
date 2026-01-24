@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: nix shell .#ci -c bash -c "pnpm install --frozen-lockfile && pnpm test"
+
+      - name: Build container
+        run: nix build .#container

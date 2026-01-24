@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: nix shell .#ci -c uv run pytest
+
+      - name: Build container
+        run: nix build .#container
