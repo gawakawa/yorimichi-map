@@ -1,6 +1,11 @@
 {
   "language": "japanese",
   "alwaysThinkingEnabled": true,
+  "statusLine": {
+    "type": "command",
+    "command": ".claude/statusline.sh",
+    "padding": 0
+  },
   "permissions": {
     "deny": [
       "Bash(git add -A:*)",
