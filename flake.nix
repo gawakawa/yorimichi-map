@@ -60,6 +60,7 @@
             statix.enable = true;
             deadnix.enable = true;
             actionlint.enable = true;
+            markdownlint.enable = true;
           };
 
           devShells.default = pkgs.mkShell {
