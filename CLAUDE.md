@@ -15,10 +15,18 @@ Monorepo with three main components, each with its own Nix flake:
 
 ## Development Setup
 
-Requires Nix with flakes enabled. In each subdirectory:
+Requires Nix with flakes enabled.
+
 ```bash
+# Root directory (for pre-commit hooks)
 direnv allow
+
+# Each subdirectory
+cd frontend && direnv allow
+cd backend && direnv allow
+cd terraform && direnv allow
 ```
+
 This auto-loads the development environment and generates `.mcp.json` for MCP integration.
 
 ## Commands
@@ -76,6 +84,7 @@ Use the `/commit` skill which:
 ## CI/CD
 
 GitHub Actions workflows run Nix-based checks:
+- `nix-ci.yml` - root flake check
 - `frontend-ci.yml` - format, lint, test
 - `backend-ci.yml` - format, lint, test
 - `terraform-ci.yml` - flake check

@@ -15,4 +15,4 @@
 ## 開発環境
 
 - Nix flake を使用
-- 各ディレクトリで `direnv allow` を実行
+- ルートディレクトリおよび各サブディレクトリで `direnv allow` を実行
