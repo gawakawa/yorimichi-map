@@ -1,3 +1,15 @@
 {
-  "language": "japanese"
+  "language": "japanese",
+  "alwaysThinkingEnabled": true,
+  "permissions": {
+    "deny": [
+      "Bash(git add -A:*)",
+      "Bash(git add --all:*)",
+      "Bash(git add .:*)",
+      "Bash(git add -u:*)",
+      "Bash(git push:*)",
+      "Bash(git commit --no-verify:*)",
+      "Bash(git commit -n:*)"
+    ]
+  }
 }
