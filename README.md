@@ -2,7 +2,7 @@
 
 - 寄り道スポットを含めた経路探索アプリ
 
-## コントリビューション
+## 開発
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
@@ -11,8 +11,3 @@
 - `frontend/` - フロントエンド
 - `backend/` - バックエンド
 - `terraform/` - インフラ
-
-## 開発環境
-
-- Nix flake を使用
-- ルートディレクトリおよび各サブディレクトリで `direnv allow` を実行
