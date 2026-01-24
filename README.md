@@ -8,6 +8,7 @@
 
 ## 構成
 
-- `frontend/` - フロントエンド
-- `backend/` - バックエンド
-- `terraform/` - インフラ
+.
+├── frontend/   # フロントエンド
+├── backend/    # バックエンド
+└── terraform/  # インフラ
