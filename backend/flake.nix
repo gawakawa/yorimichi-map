@@ -55,8 +55,8 @@
             ty = {
               enable = true;
               name = "ty";
-              entry = "${pkgs.ty}/bin/ty check";
-              files = "\\.py$";
+              entry = "${pkgs.ty}/bin/ty check --project backend";
+              files = "^backend/.*\\.py$";
               pass_filenames = false;
             };
           };
