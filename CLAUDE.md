@@ -33,16 +33,22 @@ This auto-loads the development environment and generates `.mcp.json` for MCP in
 
 ### Frontend (`frontend/`)
 ```bash
-pnpm install        # Install dependencies
-pnpm test           # Run tests (Vitest)
-pnpm lint           # Run linter (oxlint with type-aware checks)
+pnpm install              # Install dependencies
+pnpm test                 # Run all tests (Vitest)
+pnpm test path/to/file    # Run a single test file
+pnpm lint                 # Run linter (oxlint with type-aware checks)
+nix fmt                   # Format code
+nix fmt -- --ci           # Check formatting (CI mode)
 ```
 
 ### Backend (`backend/`)
 ```bash
-uv sync             # Install dependencies
-uv run pytest -v    # Run tests
-uv run ruff check   # Run linter
+uv sync --all-groups      # Install all dependencies
+uv run pytest -v          # Run all tests
+uv run pytest path/to/file.py -v  # Run a single test file
+uv run ruff check         # Run linter
+nix fmt                   # Format code
+nix fmt -- --ci           # Check formatting (CI mode)
 ```
 
 ### Terraform (`terraform/`)
