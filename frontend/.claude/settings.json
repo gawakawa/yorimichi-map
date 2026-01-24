@@ -1,15 +1,5 @@
 {
-	"hooks": {
-		"PostToolUse": [
-			{
-				"matcher": "Edit|MultiEdit|Write",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "cd ${CLAUDE_PROJECT_DIR} && nix flake check && pnpm lint"
-					}
-				]
-			}
-		]
+	"enabledPlugins": {
+		"typescript-lsp@claude-plugins-official": true
 	}
 }
