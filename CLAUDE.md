@@ -10,8 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Monorepo with three main components, each with its own Nix flake:
 
-- `frontend/` - TypeScript/React frontend (Node.js 24, pnpm)
-- `backend/` - Python backend (Python 3.12, uv)
+- `frontend/` - React 19 + Vite frontend (Node.js 24, pnpm)
+- `backend/` - Django 6 REST API (Python 3.13, uv)
 - `terraform/` - Infrastructure as Code (OpenTofu)
 
 ## Development Setup
@@ -36,6 +36,8 @@ This auto-loads the development environment and generates `.mcp.json` for MCP in
 
 ```bash
 pnpm install              # Install dependencies
+pnpm dev                  # Start dev server (localhost:5173)
+pnpm build                # Build for production
 pnpm test                 # Run all tests (Vitest)
 pnpm test path/to/file    # Run a single test file
 pnpm lint                 # Run linter (oxlint with type-aware checks)
@@ -47,12 +49,15 @@ nix fmt -- --ci           # Check formatting (CI mode)
 
 ```bash
 uv sync --all-groups      # Install all dependencies
+uv run python manage.py runserver  # Start dev server (localhost:8000)
 uv run pytest -v          # Run all tests
 uv run pytest path/to/file.py -v  # Run a single test file
 uv run ruff check         # Run linter
 nix fmt                   # Format code
 nix fmt -- --ci           # Check formatting (CI mode)
 ```
+
+API docs available at `/api/docs/` (Swagger UI) when dev server is running.
 
 ### Terraform (`terraform/`)
 
@@ -62,11 +67,25 @@ tofu plan           # Plan changes
 tofu apply          # Apply changes
 ```
 
+## Architecture
+
+### Frontend
+
+- React 19 with React Compiler (via babel-plugin-react-compiler)
+- Vite bundler (using rolldown-vite)
+- Formatter: oxfmt (tabs, single quotes)
+
+### Backend
+
+- Django REST Framework with drf-spectacular for OpenAPI
+- CORS configured for frontend dev server (localhost:5173)
+- SQLite database (development)
+
 ## Code Style
 
 ### TypeScript (Frontend)
 
-- Formatter: Biome (tabs, single quotes)
+- Formatter: oxfmt (tabs, single quotes)
 - Linter: oxlint with type-aware checks
 - TypeScript strict mode with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
 
@@ -74,6 +93,7 @@ tofu apply          # Apply changes
 
 - Formatter: ruff-format
 - Linter: ruff
+- Type checker: ty (excludes Django-generated files)
 
 ### Nix
 
@@ -86,7 +106,8 @@ Automatically enforced via git-hooks-nix:
 - treefmt (formatting for all file types)
 - statix, deadnix (Nix linting)
 - actionlint (GitHub Actions validation)
-- ruff (Python, backend only)
+- ruff, ty (Python, backend only)
+- oxlint (TypeScript, frontend only)
 
 ## Commit Convention
 
