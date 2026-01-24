@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Structure
 
 Monorepo with three main components, each with its own Nix flake:
+
 - `frontend/` - TypeScript/React frontend (Node.js 24, pnpm)
 - `backend/` - Python backend (Python 3.12, uv)
 - `terraform/` - Infrastructure as Code (OpenTofu)
@@ -32,6 +33,7 @@ This auto-loads the development environment and generates `.mcp.json` for MCP in
 ## Commands
 
 ### Frontend (`frontend/`)
+
 ```bash
 pnpm install              # Install dependencies
 pnpm test                 # Run all tests (Vitest)
@@ -42,6 +44,7 @@ nix fmt -- --ci           # Check formatting (CI mode)
 ```
 
 ### Backend (`backend/`)
+
 ```bash
 uv sync --all-groups      # Install all dependencies
 uv run pytest -v          # Run all tests
@@ -52,6 +55,7 @@ nix fmt -- --ci           # Check formatting (CI mode)
 ```
 
 ### Terraform (`terraform/`)
+
 ```bash
 tofu init           # Initialize
 tofu plan           # Plan changes
@@ -61,20 +65,24 @@ tofu apply          # Apply changes
 ## Code Style
 
 ### TypeScript (Frontend)
+
 - Formatter: Biome (tabs, single quotes)
 - Linter: oxlint with type-aware checks
 - TypeScript strict mode with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
 
 ### Python (Backend)
+
 - Formatter: ruff-format
 - Linter: ruff
 
 ### Nix
+
 - Formatter: nixfmt
 
 ## Pre-commit Hooks
 
 Automatically enforced via git-hooks-nix:
+
 - treefmt (formatting for all file types)
 - statix, deadnix (Nix linting)
 - actionlint (GitHub Actions validation)
@@ -83,6 +91,7 @@ Automatically enforced via git-hooks-nix:
 ## Commit Convention
 
 Use the `/commit` skill which:
+
 - Requires gitmoji prefix (e.g., `:sparkles:`, `:bug:`, `:wrench:`)
 - Commit messages in Japanese
 - Never uses `git add -A` or `git add .` - always explicit file selection
@@ -90,6 +99,7 @@ Use the `/commit` skill which:
 ## CI/CD
 
 GitHub Actions workflows run Nix-based checks:
+
 - `nix-ci.yml` - root flake check
 - `frontend-ci.yml` - format, lint, test
 - `backend-ci.yml` - format, lint, test
