@@ -3,8 +3,7 @@
 ## 開発環境のセットアップ
 
 1. Nix をインストール
-2. `direnv allow` を実行
-3. 各ディレクトリ（frontend/, backend/）で `direnv allow` を実行
+2. 各ディレクトリ（frontend/, backend/, terraform/）で `direnv allow` を実行
 
 ## Issue
 

@@ -11,8 +11,13 @@ permissions:
 
 jobs:
   update-flake-lock:
+    strategy:
+      matrix:
+        directory: [frontend, backend, terraform]
     uses: gawakawa/.github/.github/workflows/update-flake-lock.yml@main
     with:
       auto-merge: true
+      path-to-flake-dir: ${{ matrix.directory }}
+      branch: update-flake-lock-${{ matrix.directory }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
