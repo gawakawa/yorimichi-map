@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: CI
+  check:
+    name: Check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -30,16 +30,8 @@ jobs:
         with:
           github_access_token: ${{ secrets.GH_TOKEN }}
 
-      - name: Format check
-        run: nix fmt -- --ci
+      - name: Check
+        run: nix flake check
 
-      - name: Install dependencies
-        run: |
-          nix profile add .#ci
-          pnpm install
-
-      - name: Lint and type check
-        run: pnpm lint
-
-      - name: Run tests
-        run: pnpm test
+      - name: Test
+        run: nix shell .#ci -c bash -c "pnpm install --frozen-lockfile && pnpm test"

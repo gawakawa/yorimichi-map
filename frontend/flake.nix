@@ -40,6 +40,13 @@
             ++ (with pkgs; [
               # Additional development tools can be added here
             ]);
+
+          oxfmtConfig = pkgs.writeText "oxfmtrc.json" (
+            builtins.toJSON {
+              useTabs = true;
+              singleQuote = true;
+            }
+          );
         in
         {
           packages = {
@@ -51,6 +58,13 @@
 
           pre-commit.settings.hooks = {
             treefmt.enable = true;
+            oxlint = {
+              enable = true;
+              name = "oxlint";
+              entry = "${pkgs.oxlint}/bin/oxlint --type-aware";
+              files = "\\.(ts|tsx|js|jsx)$";
+              pass_filenames = false;
+            };
           };
 
           devShells.default = pkgs.mkShell {
@@ -63,7 +77,7 @@
 
           treefmt = {
             programs = {
-              biome = {
+              oxfmt = {
                 enable = true;
                 includes = [
                   "*.ts"
@@ -73,6 +87,10 @@
                 ];
               };
             };
+            settings.formatter.oxfmt.options = [
+              "--config"
+              (toString oxfmtConfig)
+            ];
           };
         };
     };

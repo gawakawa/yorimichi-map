@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tests:
-    name: Build and Test
+  check:
+    name: Check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -30,20 +30,8 @@ jobs:
         with:
           github_access_token: ${{ secrets.GH_TOKEN }}
 
-      - name: Format check
-        run: nix fmt -- --ci
+      - name: Check
+        run: nix flake check
 
-      - name: Install CI dependencies
-        run: nix profile add .#ci
-
-      - name: Install Python dependencies
-        run: uv sync --all-groups
-
-      - name: Lint check
-        run: uv run ruff check
-
-      - name: Build project
-        run: uv build
-
-      - name: Run tests
-        run: uv run pytest -v
+      - name: Test
+        run: nix shell .#ci -c uv run pytest
