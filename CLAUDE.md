@@ -73,13 +73,35 @@ tofu apply          # Apply changes
 
 - React 19 with React Compiler (via babel-plugin-react-compiler)
 - Vite bundler (using rolldown-vite)
+- TanStack Query for data fetching
 - Formatter: oxfmt (tabs, single quotes)
 
 ### Backend
 
 - Django REST Framework with drf-spectacular for OpenAPI
+- Python dependencies managed via uv with uv2nix for Nix integration
 - CORS configured for frontend dev server (localhost:5173)
-- SQLite database (development)
+- SQLite database (development), gunicorn for production
+
+## Containerization
+
+Containers are built with nix2container:
+
+```bash
+# Frontend container (nginx on port 8080)
+cd frontend && nix build .#container
+# Copy to Docker: nix run .#container.copyToDockerDaemon
+
+# Backend container (gunicorn on port 8000)
+cd backend && nix build .#container
+# Copy to Docker: nix run .#container.copyToDockerDaemon
+```
+
+## API Endpoints
+
+- `GET /api/health/` - Health check
+- `GET /api/schema/` - OpenAPI schema
+- `GET /api/docs/` - Swagger UI documentation
 
 ## Code Style
 
