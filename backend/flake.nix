@@ -11,6 +11,21 @@
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pyproject-nix = {
+      url = "github:pyproject-nix/pyproject.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    uv2nix = {
+      url = "github:pyproject-nix/uv2nix";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.uv2nix.follows = "uv2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -29,31 +44,56 @@
       perSystem =
         {
           config,
-          inputs,
+          inputs',
+          lib,
           pkgs,
-          system,
           ...
         }:
         let
-          inherit (inputs.nix2container.packages.${system}) nix2container;
+          inherit (inputs'.nix2container.packages) nix2container;
+          inherit (inputs.uv2nix.lib) workspace;
+          inherit (inputs.pyproject-build-systems.overlays) wheel;
 
-          ciPackages = with pkgs; [
-            python312
-            uv
+          python = pkgs.python312;
+
+          workspaceConfig = workspace.loadWorkspace { workspaceRoot = ./.; };
+
+          overlay = workspaceConfig.mkPyprojectOverlay {
+            sourcePreference = "wheel";
+          };
+
+          editableOverlay = workspaceConfig.mkEditablePyprojectOverlay {
+            root = "$REPO_ROOT";
+          };
+
+          pythonSet =
+            (pkgs.callPackage inputs.pyproject-nix.build.packages {
+              inherit python;
+            }).overrideScope
+              (
+                lib.composeManyExtensions [
+                  wheel
+                  overlay
+                ]
+              );
+
+          editablePythonSet = pythonSet.overrideScope editableOverlay;
+
+          virtualenv = editablePythonSet.mkVirtualEnv "yorimichi-map-backend-dev-env" workspaceConfig.deps.all;
+
+          ciPackages = [
+            pkgs.uv
           ];
 
           devPackages =
             ciPackages
-            ++ config.pre-commit.settings.enabledPackages
-            ++ (with pkgs; [
-              # Additional development tools can be added here
-            ]);
+            ++ config.pre-commit.settings.enabledPackages;
         in
         {
           packages = {
             ci = pkgs.buildEnv {
               name = "ci";
-              paths = ciPackages;
+              paths = ciPackages ++ [ virtualenv ];
             };
 
             container = nix2container.buildImage {
@@ -77,10 +117,20 @@
           };
 
           devShells.default = pkgs.mkShell {
-            buildInputs = devPackages;
+            packages = [
+              virtualenv
+            ] ++ devPackages;
+
+            env = {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = python.interpreter;
+              UV_PYTHON_DOWNLOADS = "never";
+            };
 
             shellHook = ''
               ${config.pre-commit.shellHook}
+              unset PYTHONPATH
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
             '';
           };
 
