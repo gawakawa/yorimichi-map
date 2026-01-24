@@ -13,3 +13,6 @@ dev = [
     "pytest>=9.0.2",
     "ty>=0.0.13",
 ]
+
+[tool.ty.src]
+exclude = ["yorimichi_map_backend/", "manage.py"]
