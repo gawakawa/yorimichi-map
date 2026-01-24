@@ -2,6 +2,10 @@
 
 - 寄り道スポットを含めた経路探索アプリ
 
+## コントリビューション
+
+[CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
+
 ## 構成
 
 - `frontend/` - フロントエンド
