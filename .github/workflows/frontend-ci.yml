@@ -61,6 +61,5 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
-          nix run nixpkgs#skopeo -- copy \
-            docker-archive:./result \
+          nix run .#container.copyToRegistry -- \
             docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }}
