@@ -11,6 +11,7 @@
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mcp-servers-nix.url = "github:natsukium/mcp-servers-nix";
   };
 
   outputs =
@@ -96,6 +97,27 @@
               singleQuote = true;
             }
           );
+
+          mcpConfig =
+            inputs.mcp-servers-nix.lib.mkConfig
+              (import inputs.mcp-servers-nix.inputs.nixpkgs {
+                inherit system;
+              })
+              {
+                programs.nixos.enable = true;
+                settings.servers.chrome-devtools = {
+                  command = "${pkgs.lib.getExe' pkgs.nodejs_24 "npx"}";
+                  args = [
+                    "-y"
+                    "chrome-devtools-mcp@latest"
+                    "--executablePath"
+                    "${pkgs.lib.getExe pkgs.ungoogled-chromium}"
+                  ];
+                  env = {
+                    PATH = "${pkgs.nodejs_24}/bin:${pkgs.bash}/bin";
+                  };
+                };
+              };
         in
         {
           packages = {
@@ -105,6 +127,8 @@
             };
 
             inherit frontend;
+
+            mcp-config = mcpConfig;
 
             container = nix2container.buildImage {
               name = "yorimichi-map-frontend";
@@ -145,6 +169,8 @@
 
             shellHook = ''
               ${config.pre-commit.shellHook}
+              cat ${mcpConfig} > .mcp.json
+              echo "Generated .mcp.json"
             '';
           };
 
