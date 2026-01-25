@@ -40,6 +40,7 @@
             ++ (with pkgs; [
               curl
               gh
+              google-cloud-sdk
               jq
               podman
               tree
