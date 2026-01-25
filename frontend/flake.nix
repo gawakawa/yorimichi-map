@@ -75,7 +75,7 @@
                           port = 8080;
                         }
                       ];
-                      root = "/dist";
+                      root = "/";
                       locations."/".tryFiles = "$uri $uri/ /index.html";
                     };
                   };
