@@ -55,41 +55,38 @@
           };
 
           nginxConf =
-            let
-              nginxConfig =
-                (import (pkgs.path + "/nixos/lib/eval-config.nix") {
-                  inherit system;
-                  modules = [
-                    {
-                      nixpkgs.hostPlatform = system;
-                      system.stateVersion = "24.11";
-                      services.nginx = {
-                        enable = true;
-                        user = "root";
-                        group = "root";
-                        appendConfig = ''
-                          error_log /dev/stderr;
-                          daemon off;
-                        '';
-                        appendHttpConfig = ''
-                          access_log /dev/stdout combined;
-                        '';
-                        virtualHosts."localhost" = {
-                          listen = [
-                            {
-                              addr = "0.0.0.0";
-                              port = 8080;
-                            }
-                          ];
-                          root = "/dist";
-                          locations."/".tryFiles = "$uri $uri/ /index.html";
-                        };
-                      };
-                    }
-                  ];
-                }).config.services.nginx.config;
-            in
-            pkgs.writeText "nginx.conf" nginxConfig;
+            (import (pkgs.path + "/nixos/lib/eval-config.nix") {
+              inherit system;
+              modules = [
+                {
+                  nixpkgs.hostPlatform = system;
+                  system.stateVersion = "24.11";
+                  services.nginx = {
+                    enable = true;
+                    enableReload = true;
+                    user = "root";
+                    group = "root";
+                    appendConfig = ''
+                      error_log /dev/stderr;
+                      daemon off;
+                    '';
+                    appendHttpConfig = ''
+                      access_log /dev/stdout combined;
+                    '';
+                    virtualHosts."localhost" = {
+                      listen = [
+                        {
+                          addr = "0.0.0.0";
+                          port = 8080;
+                        }
+                      ];
+                      root = "/dist";
+                      locations."/".tryFiles = "$uri $uri/ /index.html";
+                    };
+                  };
+                }
+              ];
+            }).config.environment.etc."nginx/nginx.conf".source;
 
           ciPackages = with pkgs; [
             pnpm
