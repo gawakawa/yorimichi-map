@@ -66,10 +66,6 @@
                     enableReload = true;
                     user = "root";
                     group = "root";
-                    appendConfig = ''
-                      error_log /dev/stderr;
-                      daemon off;
-                    '';
                     appendHttpConfig = ''
                       access_log /dev/stdout combined;
                     '';
@@ -157,6 +153,8 @@
               config = {
                 Cmd = [
                   "${pkgs.nginx}/bin/nginx"
+                  "-e"
+                  "/dev/stderr"
                   "-c"
                   nginxConf
                 ];
