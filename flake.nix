@@ -38,7 +38,11 @@
             ciPackages
             ++ config.pre-commit.settings.enabledPackages
             ++ (with pkgs; [
-              # Additional development tools can be added here
+              curl
+              gh
+              jq
+              podman
+              tree
             ]);
 
           mcpConfig = inputs.mcp-servers-nix.lib.mkConfig (import inputs.mcp-servers-nix.inputs.nixpkgs {

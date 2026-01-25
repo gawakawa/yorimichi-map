@@ -20,6 +20,7 @@
 - `pnpm lint` - リンター・型チェック
 - `nix fmt` - フォーマット
 - `nix build` - 本番ビルド
+- `nix run .#container.copyToPodman && podman run --rm -p 8080:8080 yorimichi-map-frontend` - コンテナで起動
 
 詳細は [`flake.nix`](./flake.nix) および [`package.json`](./package.json) を参照。
 

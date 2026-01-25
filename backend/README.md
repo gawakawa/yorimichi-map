@@ -21,6 +21,7 @@
 - `uv run ty check` - 型チェック
 - `nix fmt` - フォーマット
 - `nix build` - 本番ビルド
+- `nix run .#container.copyToPodman && podman run --rm -p 8000:8000 yorimichi-map-backend` - コンテナで起動
 
 詳細は [`flake.nix`](./flake.nix) および [`pyproject.toml`](./pyproject.toml) を参照。
 
