@@ -8,9 +8,6 @@
 
 ## 構成
 
-```text
-.
-├── frontend/   # フロントエンド
-├── backend/    # バックエンド
-└── terraform/  # インフラ
-```
+- [frontend/](./frontend/) - フロントエンド (React)
+- [backend/](./backend/) - バックエンド (Django)
+- [terraform/](./terraform/) - インフラ (Terraform)
