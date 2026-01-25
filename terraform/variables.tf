@@ -15,3 +15,9 @@ variable "zone" {
   type        = string
   default     = "asia-northeast1-a"
 }
+
+variable "billing_account_id" {
+  description = "GCP billing account ID (format: XXXXXX-XXXXXX-XXXXXX)"
+  type        = string
+  sensitive   = true
+}

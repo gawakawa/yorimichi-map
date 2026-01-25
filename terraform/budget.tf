@@ -1,0 +1,45 @@
+data "google_billing_account" "account" {
+  billing_account = var.billing_account_id
+}
+
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
+resource "google_billing_budget" "monthly" {
+  billing_account = data.google_billing_account.account.id
+  display_name    = "yorimichi-map Monthly Budget"
+
+  budget_filter {
+    projects               = ["projects/${data.google_project.project.number}"]
+    calendar_period        = "MONTH"
+    credit_types_treatment = "INCLUDE_ALL_CREDITS"
+  }
+
+  amount {
+    specified_amount {
+      currency_code = "JPY"
+      units         = "10000"
+    }
+  }
+
+  threshold_rules {
+    threshold_percent = 0.5
+    spend_basis       = "CURRENT_SPEND"
+  }
+
+  threshold_rules {
+    threshold_percent = 0.9
+    spend_basis       = "CURRENT_SPEND"
+  }
+
+  threshold_rules {
+    threshold_percent = 1.0
+    spend_basis       = "CURRENT_SPEND"
+  }
+
+  threshold_rules {
+    threshold_percent = 1.0
+    spend_basis       = "FORECASTED_SPEND"
+  }
+}
