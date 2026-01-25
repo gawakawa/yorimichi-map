@@ -17,7 +17,7 @@
 
 - `pnpm dev` - 開発サーバー起動 (localhost:5173)
 - `pnpm test` - テスト実行
-- `pnpm lint` - リンター実行
+- `pnpm lint` - リンター・型チェック
 - `nix fmt` - フォーマット
 - `nix build` - 本番ビルド
 
