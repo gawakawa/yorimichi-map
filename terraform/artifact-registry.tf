@@ -4,6 +4,12 @@ resource "google_project_service" "artifactregistry" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "containerscanning" {
+  project            = var.project_id
+  service            = "containerscanning.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_artifact_registry_repository" "docker" {
   repository_id = "yorimichi-map"
   location      = var.region
@@ -30,5 +36,12 @@ resource "google_artifact_registry_repository" "docker" {
     }
   }
 
-  depends_on = [google_project_service.artifactregistry]
+  vulnerability_scanning_config {
+    enablement_config = "INHERITED"
+  }
+
+  depends_on = [
+    google_project_service.artifactregistry,
+    google_project_service.containerscanning
+  ]
 }
