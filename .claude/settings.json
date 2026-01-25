@@ -8,7 +8,8 @@
   },
   "permissions": {
     "ask": [
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "Bash(tofu apply:*)"
     ],
     "deny": [
       "Bash(git add -A:*)",
