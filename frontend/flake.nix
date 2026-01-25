@@ -55,29 +55,41 @@
           };
 
           nginxConf =
-            (import (pkgs.path + "/nixos/lib/eval-config.nix") {
-              inherit system;
-              modules = [
-                {
-                  nixpkgs.hostPlatform = system;
-                  system.stateVersion = "24.11";
-                  services.nginx = {
-                    enable = true;
-                    enableReload = true;
-                    virtualHosts."localhost" = {
-                      listen = [
-                        {
-                          addr = "0.0.0.0";
-                          port = 8080;
-                        }
-                      ];
-                      root = "/dist";
-                      locations."/".tryFiles = "$uri $uri/ /index.html";
-                    };
-                  };
-                }
-              ];
-            }).config.environment.etc."nginx/nginx.conf".source;
+            let
+              nginxConfig =
+                (import (pkgs.path + "/nixos/lib/eval-config.nix") {
+                  inherit system;
+                  modules = [
+                    {
+                      nixpkgs.hostPlatform = system;
+                      system.stateVersion = "24.11";
+                      services.nginx = {
+                        enable = true;
+                        user = "root";
+                        group = "root";
+                        appendConfig = ''
+                          error_log /dev/stderr;
+                          daemon off;
+                        '';
+                        appendHttpConfig = ''
+                          access_log /dev/stdout combined;
+                        '';
+                        virtualHosts."localhost" = {
+                          listen = [
+                            {
+                              addr = "0.0.0.0";
+                              port = 8080;
+                            }
+                          ];
+                          root = "/dist";
+                          locations."/".tryFiles = "$uri $uri/ /index.html";
+                        };
+                      };
+                    }
+                  ];
+                }).config.services.nginx.config;
+            in
+            pkgs.writeText "nginx.conf" nginxConfig;
 
           ciPackages = with pkgs; [
             pnpm
@@ -137,6 +149,11 @@
                 paths = [
                   frontend
                   pkgs.nginx
+                  (pkgs.runCommand "container-init" { } ''
+                    mkdir -p $out/var/log/nginx $out/var/cache/nginx $out/tmp $out/etc
+                    echo "root:x:0:0:root:/root:/bin/sh" > $out/etc/passwd
+                    echo "root:x:0:" > $out/etc/group
+                  '')
                 ];
                 pathsToLink = [ "/" ];
               };

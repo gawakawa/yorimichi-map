@@ -21,3 +21,13 @@ variable "billing_account_id" {
   type        = string
   sensitive   = true
 }
+
+variable "frontend_image_tag" {
+  description = "Frontend container image tag (commit SHA)"
+  type        = string
+}
+
+variable "backend_image_tag" {
+  description = "Backend container image tag (commit SHA)"
+  type        = string
+}
