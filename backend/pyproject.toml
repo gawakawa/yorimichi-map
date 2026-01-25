@@ -19,4 +19,4 @@ dev = [
 ]
 
 [tool.ty.src]
-exclude = ["tests/", "yorimichi_map_backend/", "manage.py"]
+exclude = ["yorimichi_map_backend/", "manage.py", "tests/"]
