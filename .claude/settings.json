@@ -7,6 +7,9 @@
     "padding": 0
   },
   "permissions": {
+    "ask": [
+      "Bash(gh pr create:*)"
+    ],
     "deny": [
       "Bash(git add -A:*)",
       "Bash(git add --all:*)",
