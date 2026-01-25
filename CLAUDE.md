@@ -38,6 +38,8 @@ cd terraform && direnv allow
 
 This auto-loads the development environment and generates `.mcp.json` for MCP integration.
 
+Use `direnv exec` instead of `nix develop` to run commands.
+
 ## Code Style
 
 ### Nix
