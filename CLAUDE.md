@@ -14,6 +14,14 @@ Monorepo with three main components, each with its own Nix flake:
 - `backend/` - Django 6 REST API (Python 3.13, uv)
 - `terraform/` - Infrastructure as Code (OpenTofu)
 
+Directory-specific rules (commands, architecture, code style) are in:
+
+- `.claude/rules/frontend/` - Frontend rules
+- `.claude/rules/backend/` - Backend rules
+- `.claude/rules/terraform/` - Terraform rules
+
+Do not duplicate them here.
+
 ## Development Setup
 
 Requires Nix with flakes enabled.
@@ -30,93 +38,7 @@ cd terraform && direnv allow
 
 This auto-loads the development environment and generates `.mcp.json` for MCP integration.
 
-## Commands
-
-### Frontend (`frontend/`)
-
-```bash
-pnpm install              # Install dependencies
-pnpm dev                  # Start dev server (localhost:5173)
-pnpm build                # Build for production
-pnpm test                 # Run all tests (Vitest)
-pnpm test path/to/file    # Run a single test file
-pnpm lint                 # Run linter (oxlint with type-aware checks)
-nix fmt                   # Format code
-nix fmt -- --ci           # Check formatting (CI mode)
-```
-
-### Backend (`backend/`)
-
-```bash
-uv sync --all-groups      # Install all dependencies
-uv run python manage.py runserver  # Start dev server (localhost:8000)
-uv run pytest -v          # Run all tests
-uv run pytest path/to/file.py -v  # Run a single test file
-uv run ruff check         # Run linter
-uv run ty check           # Run type checker
-nix fmt                   # Format code
-nix fmt -- --ci           # Check formatting (CI mode)
-```
-
-API docs available at `/api/docs/` (Swagger UI) when dev server is running.
-
-### Terraform (`terraform/`)
-
-```bash
-tofu init           # Initialize
-tofu plan           # Plan changes
-tofu apply          # Apply changes
-```
-
-## Architecture
-
-### Frontend
-
-- React 19 with React Compiler (via babel-plugin-react-compiler)
-- Vite bundler (using rolldown-vite)
-- TanStack Query for data fetching
-- Formatter: oxfmt (tabs, single quotes)
-
-### Backend
-
-- Django REST Framework with drf-spectacular for OpenAPI
-- Python dependencies managed via uv with uv2nix for Nix integration
-- CORS configured for frontend dev server (localhost:5173)
-- SQLite database (development), gunicorn for production
-
-## Containerization
-
-Containers are built with nix2container:
-
-```bash
-# Frontend container (nginx on port 8080)
-cd frontend && nix build .#container
-# Copy to Docker: nix run .#container.copyToDockerDaemon
-
-# Backend container (gunicorn on port 8000)
-cd backend && nix build .#container
-# Copy to Docker: nix run .#container.copyToDockerDaemon
-```
-
-## API Endpoints
-
-- `GET /api/health/` - Health check
-- `GET /api/schema/` - OpenAPI schema
-- `GET /api/docs/` - Swagger UI documentation
-
 ## Code Style
-
-### TypeScript (Frontend)
-
-- Formatter: oxfmt (tabs, single quotes)
-- Linter: oxlint with type-aware checks
-- TypeScript strict mode with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
-
-### Python (Backend)
-
-- Formatter: ruff-format
-- Linter: ruff
-- Type checker: ty (excludes Django-generated files)
 
 ### Nix
 
