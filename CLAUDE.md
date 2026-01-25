@@ -53,6 +53,7 @@ uv run python manage.py runserver  # Start dev server (localhost:8000)
 uv run pytest -v          # Run all tests
 uv run pytest path/to/file.py -v  # Run a single test file
 uv run ruff check         # Run linter
+uv run ty check           # Run type checker
 nix fmt                   # Format code
 nix fmt -- --ci           # Check formatting (CI mode)
 ```
@@ -131,13 +132,15 @@ Automatically enforced via git-hooks-nix:
 - ruff, ty (Python, backend only)
 - oxlint (TypeScript, frontend only)
 
-## Commit Convention
+## Commit and PR Convention
 
 Use the `/commit` skill which:
 
 - Requires gitmoji prefix (e.g., `:sparkles:`, `:bug:`, `:wrench:`)
 - Commit messages in Japanese
 - Never uses `git add -A` or `git add .` - always explicit file selection
+
+Use the `/pr` skill to create pull requests with Japanese descriptions.
 
 ## CI/CD
 
