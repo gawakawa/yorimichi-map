@@ -5,5 +5,8 @@
   "MD032": false,
   "MD040": false,
   "MD022": false,
-  "MD060": false
+  "MD060": false,
+  "MD033": {
+    "allowed_elements": [ "a" ]
+  }
 }
