@@ -50,14 +50,14 @@ url = generate_google_maps_url(
 
 ### ベースURL
 
-```
+```text
 https://www.google.com/maps/dir/?api=1
 ```
 
 ### パラメータ
 
 | パラメータ | 説明 | 必須 | 例 |
-|----------|------|------|-----|
+| ---------- | ------ | ------ | ----- |
 | `origin` | 出発地 | はい | 東京駅 |
 | `destination` | 目的地 | はい | 箱根湯本駅 |
 | `travelmode` | 移動手段 | いいえ | driving, walking, bicycling, transit |
@@ -164,7 +164,8 @@ urllib.parse.urlencode(params)
 ```
 
 例:
-```
+
+```text
 東京駅 → %E6%9D%B1%E4%BA%AC%E9%A7%85
 ```
 
@@ -181,6 +182,7 @@ urllib.parse.urlencode(params)
 **原因**: URLエンコーディングの問題
 
 **解決方法**:
+
 ```python
 # 正しい方法
 url = base_url + "&" + urllib.parse.urlencode(params)
@@ -194,6 +196,7 @@ url = f"{base_url}&origin={origin}&destination={destination}"
 **原因**: 経由地の区切り文字が誤っている
 
 **解決方法**:
+
 ```python
 # 正しい方法
 params["waypoints"] = "|".join(waypoints)  # パイプ文字で区切る

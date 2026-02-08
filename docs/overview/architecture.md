@@ -56,12 +56,14 @@
 ### ツールマネージャー
 
 #### Google Maps Routes API
+
 - ルート計算
 - 交通情報考慮
 - 通行料金算出
 - 所要時間予測
 
 #### Google Maps Places API (New)
+
 - スポット検索
 - 評価・レビュー取得
 - 写真情報

@@ -4,6 +4,7 @@
 
 This module provides...
 
+<!-- markdownlint-disable MD033 MD060 -->
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -59,6 +60,7 @@ No modules.
 | <a name="output_github_actions_service_account"></a> [github\_actions\_service\_account](#output\_github\_actions\_service\_account) | Service account email for GitHub Actions |
 | <a name="output_workload_identity_provider"></a> [workload\_identity\_provider](#output\_workload\_identity\_provider) | Workload Identity Provider resource name for GitHub Actions |
 <!-- END_TF_DOCS -->
+<!-- markdownlint-enable MD033 MD060 -->
 
 ## Usage
 

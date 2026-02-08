@@ -1,10 +1,12 @@
+<!-- markdownlint-disable MD024 -->
+
 # 🔍 トラブルシューティング
 
 ## API キーエラー
 
 ### エラーメッセージ
 
-```
+```text
 API Keyが設定されていません。.envファイルを確認してください。
 ```
 
@@ -18,35 +20,35 @@ API Keyが設定されていません。.envファイルを確認してくださ
 
 1. **`.env`ファイルの確認**
 
-```bash
-# ファイルが存在するか確認
-ls -la .env
+   ```bash
+   # ファイルが存在するか確認
+   ls -la .env
 
-# 内容を確認（キーは非表示にする）
-cat .env
-```
+   # 内容を確認（キーは非表示にする）
+   cat .env
+   ```
 
-2. **正しいフォーマットで設定**
+1. **正しいフォーマットで設定**
 
-```bash
-# .envファイルの内容
-MAPS_API_KEY=AIzaSy...
-GEMINI_API_KEY=AIzaSy...
-```
+   ```bash
+   # .envファイルの内容
+   MAPS_API_KEY=AIzaSy...
+   GEMINI_API_KEY=AIzaSy...
+   ```
 
-3. **アプリケーションの再起動**
+1. **アプリケーションの再起動**
 
-```bash
-# Streamlitアプリを停止（Ctrl+C）
-# 再度起動
-streamlit run main.py
-```
+   ```bash
+   # Streamlitアプリを停止（Ctrl+C）
+   # 再度起動
+   streamlit run main.py
+   ```
 
 ## ルートが見つからない
 
 ### エラーメッセージ
 
-```
+```text
 ルートが見つかりませんでした。
 ```
 
@@ -61,27 +63,27 @@ streamlit run main.py
 
 1. **場所の名称を具体的にする**
 
-```
-❌ 「東京」
-✅ 「東京駅」
+   ```text
+   ❌ 「東京」
+   ✅ 「東京駅」
 
-❌ 「箱根」
-✅ 「箱根湯本駅」
-```
+   ❌ 「箱根」
+   ✅ 「箱根湯本駅」
+   ```
 
-2. **APIキーの権限を確認**
+1. **APIキーの権限を確認**
 
    Google Cloud Consoleで以下を確認。
 
    - Routes APIが有効化されているか
    - APIキーに適切な権限があるか
 
-3. **ネットワーク接続を確認**
+1. **ネットワーク接続を確認**
 
-```bash
-# Google Maps APIに接続できるか確認
-curl -I https://routes.googleapis.com
-```
+   ```bash
+   # Google Maps APIに接続できるか確認
+   curl -I https://routes.googleapis.com
+   ```
 
 ## 地図が表示されない
 
@@ -101,21 +103,21 @@ curl -I https://routes.googleapis.com
 
 1. **`encoded_polyline`の確認**
 
-```python
-# デバッグ用のコードを追加
-if route_data:
-    st.write("Debug:", route_data)  # ルートデータを表示
-```
+   ```python
+   # デバッグ用のコードを追加
+   if route_data:
+       st.write("Debug:", route_data)  # ルートデータを表示
+   ```
 
-2. **Foliumのバージョン確認**
+1. **Foliumのバージョン確認**
 
-```bash
-pip show folium
-# バージョンが古い場合は更新
-pip install --upgrade folium streamlit-folium
-```
+   ```bash
+   pip show folium
+   # バージョンが古い場合は更新
+   pip install --upgrade folium streamlit-folium
+   ```
 
-3. **ブラウザのキャッシュをクリア**
+1. **ブラウザのキャッシュをクリア**
 
    - Streamlitアプリを停止
    - ブラウザのキャッシュをクリア
@@ -139,26 +141,26 @@ pip install --upgrade folium streamlit-folium
 
 1. **ツールの登録を確認**
 
-```python
-# main.pyで確認
-tools_list = [search_places, calculate_route]
-model = genai.GenerativeModel(
-    model_name='gemini-1.5-pro-latest',
-    tools=tools_list,  # ツールが登録されているか
-    system_instruction=SYSTEM_PROMPT
-)
-```
+   ```python
+   # main.pyで確認
+   tools_list = [search_places, calculate_route]
+   model = genai.GenerativeModel(
+       model_name='gemini-1.5-pro-latest',
+       tools=tools_list,  # ツールが登録されているか
+       system_instruction=SYSTEM_PROMPT
+   )
+   ```
 
-2. **システムプロンプトの確認**
+1. **システムプロンプトの確認**
 
-システムプロンプトに「ツールを使用」という指示が含まれているか確認
+   システムプロンプトに「ツールを使用」という指示が含まれているか確認
 
-3. **Gemini APIキーの確認**
+1. **Gemini APIキーの確認**
 
-```bash
-# .envファイルでGEMINI_API_KEYが設定されているか確認
-cat .env | grep GEMINI_API_KEY
-```
+   ```bash
+   # .envファイルでGEMINI_API_KEYが設定されているか確認
+   cat .env | grep GEMINI_API_KEY
+   ```
 
 ## Googleマップアプリが起動しない
 
@@ -180,14 +182,14 @@ cat .env | grep GEMINI_API_KEY
    - iOS: App Storeから「Googleマップ」をインストール
    - Android: Google Playから「Googleマップ」をインストール
 
-2. **URLエンコーディングの確認**
+1. **URLエンコーディングの確認**
 
-```python
-# utils.pyで確認
-return base_url + "&" + urllib.parse.urlencode(params)
-```
+   ```python
+   # utils.pyで確認
+   return base_url + "&" + urllib.parse.urlencode(params)
+   ```
 
-3. **ブラウザの設定**
+1. **ブラウザの設定**
 
    - Safariの場合: 「設定」→「Safari」→「ポップアップブロック」をオフ
    - Chromeの場合: 「設定」→「サイトの設定」→「ポップアップとリダイレクト」を許可
@@ -196,7 +198,7 @@ return base_url + "&" + urllib.parse.urlencode(params)
 
 ### エラーメッセージ
 
-```
+```text
 ERROR: Could not find a version that satisfies the requirement...
 ```
 
@@ -210,22 +212,22 @@ ERROR: Could not find a version that satisfies the requirement...
 
 1. **Pythonのバージョン確認**
 
-```bash
-python --version
-# Python 3.9以上であることを確認
-```
+   ```bash
+   python --version
+   # Python 3.9以上であることを確認
+   ```
 
-2. **pipの更新**
+1. **pipの更新**
 
-```bash
-pip install --upgrade pip
-```
+   ```bash
+   pip install --upgrade pip
+   ```
 
-3. **依存関係の再インストール**
+1. **依存関係の再インストール**
 
-```bash
-pip install -r requirements.txt --force-reinstall
-```
+   ```bash
+   pip install -r requirements.txt --force-reinstall
+   ```
 
 ## パフォーマンスの問題
 
@@ -245,31 +247,31 @@ pip install -r requirements.txt --force-reinstall
 
 1. **APIのタイムアウト設定**
 
-```python
-# tools.pyで調整
-response = requests.post(url, json=payload, headers=headers, timeout=10)
-```
+   ```python
+   # tools.pyで調整
+   response = requests.post(url, json=payload, headers=headers, timeout=10)
+   ```
 
-2. **キャッシュの活用**
+1. **キャッシュの活用**
 
-Streamlitのキャッシュ機能を使用：
+   Streamlitのキャッシュ機能を使用：
 
-```python
-@st.cache_data
-def cached_search_places(location_query, place_type):
-    return search_places(location_query, place_type)
-```
+   ```python
+   @st.cache_data
+   def cached_search_places(location_query, place_type):
+       return search_places(location_query, place_type)
+   ```
 
-3. **スポット検索件数の調整**
+1. **スポット検索件数の調整**
 
-```python
-# tools.pyで調整
-payload = {
-    "textQuery": f"{place_type} near {location_query}",
-    "minRating": 4.0,
-    "maxResultCount": 3  # 件数を減らす
-}
-```
+   ```python
+   # tools.pyで調整
+   payload = {
+       "textQuery": f"{place_type} near {location_query}",
+       "minRating": 4.0,
+       "maxResultCount": 3  # 件数を減らす
+   }
+   ```
 
 ## 一般的なデバッグ方法
 
