@@ -1,0 +1,28 @@
+{
+  "name": "YorimichiMapTeam",
+  "root": "/home/yuma-takahashi/yorimichi-map",
+  "agents": [
+    {
+      "id": "django_lead",
+      "role": "Backend Engineer",
+      "description": "Django 6.0 & DRF担当。Vertex AIとGoogle Maps APIの統合ロジックを実装します。",
+      "context_dirs": ["backend/yorimichi_map_backend"]
+    },
+    {
+      "id": "react_lead",
+      "role": "Frontend Engineer",
+      "description": "React/TSX & Vite担当。TanStack Queryを用いたAPI連携と地図UIを実装します。",
+      "context_dirs": ["frontend/src"]
+    },
+    {
+      "id": "qa_reviewer",
+      "role": "QA & Reviewer",
+      "description": "コード品質の担保。OpenAPI(drf-spectacular)の定義とCORS設定をチェックします。"
+    },
+    {
+      "id": "nix_guard",
+      "role": "Environment Manager",
+      "description": "Nix flake checkを実行し、環境依存のエラーがないか、Git push前に確認します。"
+    }
+  ]
+}

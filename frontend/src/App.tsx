@@ -1,41 +1,89 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { ChatPanel } from './components/chat/ChatPanel';
+import { AppLayout } from './components/layout/AppLayout';
+import { MapPanel } from './components/map/MapPanel';
+import { useChat } from './hooks/useChat';
+import { useReturnRoute } from './hooks/useReturnRoute';
+import type { ChatMessage, Place, Route } from './types/navigation';
 
 function App() {
-	const [count, setCount] = useState(0);
+	const [messages, setMessages] = useState<ChatMessage[]>([]);
+	const [currentRoute, setCurrentRoute] = useState<Route | null>(null);
+	const [currentPlaces, setCurrentPlaces] = useState<Place[]>([]);
 
-	const { status } = useQuery({
-		queryKey: ['health'],
-		queryFn: async () => {
-			const res = await fetch('http://localhost:8000/api/health/');
-			if (!res.ok) throw new Error('API error');
-			return res.json();
-		},
-	});
+	const chatMutation = useChat();
+	const returnRouteMutation = useReturnRoute();
+
+	const handleSend = (text: string) => {
+		const userMessage: ChatMessage = { role: 'user', content: text };
+		const updatedMessages = [...messages, userMessage];
+		setMessages(updatedMessages);
+
+		chatMutation.mutate(
+			{ message: text, history: messages },
+			{
+				onSuccess: (data) => {
+					const assistantMessage: ChatMessage = {
+						role: 'assistant',
+						content: data.reply,
+					};
+					setMessages((prev) => [...prev, assistantMessage]);
+
+					if (data.route) {
+						setCurrentRoute(data.route);
+					}
+					if (data.places) {
+						setCurrentPlaces(data.places);
+					}
+				},
+				onError: () => {
+					const errorMessage: ChatMessage = {
+						role: 'assistant',
+						content: '申し訳ありません、エラーが発生しました。もう一度お試しください。',
+					};
+					setMessages((prev) => [...prev, errorMessage]);
+				},
+			},
+		);
+	};
+
+	const handleReturnRoute = (origin: string, destination: string, waypoints: string[]) => {
+		returnRouteMutation.mutate(
+			{ origin, destination, waypoints },
+			{
+				onSuccess: (data) => {
+					setCurrentRoute(data.route);
+					const infoMessage: ChatMessage = {
+						role: 'assistant',
+						content: `帰り道のルートを生成しました! ${data.route.origin} → ${data.route.destination}`,
+					};
+					setMessages((prev) => [...prev, infoMessage]);
+				},
+				onError: () => {
+					const errorMessage: ChatMessage = {
+						role: 'assistant',
+						content: '帰り道の計算に失敗しました。もう一度お試しください。',
+					};
+					setMessages((prev) => [...prev, errorMessage]);
+				},
+			},
+		);
+	};
 
 	return (
-		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
-			<h1>Vite + React</h1>
-			<div className="card">
-				<button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
-			</div>
-			<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-			<p>API: {status}</p>
-		</>
+		<AppLayout
+			left={
+				<ChatPanel messages={messages} onSend={handleSend} isLoading={chatMutation.isPending} />
+			}
+			right={
+				<MapPanel
+					route={currentRoute}
+					places={currentPlaces}
+					onReturnRoute={handleReturnRoute}
+					isReturnLoading={returnRouteMutation.isPending}
+				/>
+			}
+		/>
 	);
 }
 
