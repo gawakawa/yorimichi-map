@@ -159,11 +159,17 @@ def calculate_route(
         data = response.json()
     except requests.RequestException:
         logger.exception("Routes API request failed")
-        return {"error": "ルート計算に失敗しました。ネットワークを確認してください。"}
+        return {
+            "error": "ルート計算に失敗しました。ネットワークを確認してください。",
+            "error_type": "api_failure",
+        }
 
     routes = data.get("routes", [])
     if not routes:
-        return {"error": "ルートが見つかりませんでした。地名を確認してください。"}
+        return {
+            "error": "ルートが見つかりませんでした。地名を確認してください。",
+            "error_type": "not_found",
+        }
 
     route = routes[0]
 

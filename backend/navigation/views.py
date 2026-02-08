@@ -122,9 +122,15 @@ def return_route(request: Request) -> Response:
     route_data = calculate_route(origin, destination, waypoints)
 
     if "error" in route_data:
+        error_type = route_data.get("error_type", "api_failure")
+        http_status = (
+            status.HTTP_400_BAD_REQUEST
+            if error_type == "not_found"
+            else status.HTTP_502_BAD_GATEWAY
+        )
         return Response(
             {"detail": route_data["error"]},
-            status=status.HTTP_502_BAD_GATEWAY,
+            status=http_status,
         )
 
     route_data = _attach_deep_link(route_data)

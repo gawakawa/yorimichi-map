@@ -19,17 +19,20 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any
 
 import vertexai
 from django.conf import settings
 from vertexai.generative_models import (
-    AutomaticFunctionCallingResponder,
     Content,
     FunctionDeclaration,
-    GenerativeModel,
     Part,
     Tool,
+)
+from vertexai.preview.generative_models import (
+    AutomaticFunctionCallingResponder,
+    GenerativeModel,
 )
 
 from . import google_maps
@@ -101,12 +104,13 @@ _calculate_route_func = FunctionDeclaration(
 # この Tool を GenerativeModel に渡すことで Gemini がツールとして認識する。
 _tools = Tool(function_declarations=[_search_places_func, _calculate_route_func])
 
-# 関数名 → 実際の Python 関数のマッピング。
 # AutomaticFunctionCallingResponder が Gemini のツール呼び出しを受け取り、
-# この名前で対応する関数を自動実行する。
-_FUNCTION_MAP: dict[str, Any] = {
-    "search_places": google_maps.search_places,
-    "calculate_route": google_maps.calculate_route,
+# 対応する Python 関数を自動実行するためのマッピングを登録する。
+# SDK は CallableFunctionDeclaration（._function 属性を持つ）を要求するため、
+# FunctionDeclaration.from_func() で生成したオブジェクトをマッピングに使う。
+_tools._callable_functions = {
+    "search_places": FunctionDeclaration.from_func(google_maps.search_places),
+    "calculate_route": FunctionDeclaration.from_func(google_maps.calculate_route),
 }
 
 # Vertex AI SDK の初期化フラグ（1プロセスで1回だけ初期化する）
@@ -166,9 +170,14 @@ def send_message(
     """
     _ensure_initialized()
 
-    # Gemini 1.5 Pro モデルを生成（システムプロンプトとツールを設定）
+    max_history = int(os.environ.get("GEMINI_MAX_HISTORY_LENGTH", "10"))
+    if history and len(history) > max_history:
+        history = history[-max_history:]
+        logger.info("Conversation history truncated to %d messages", max_history)
+
+    # Gemini 2.5 Pro モデルを生成（システムプロンプトとツールを設定）
     model = GenerativeModel(
-        "gemini-1.5-pro",
+        "gemini-2.5-pro",
         system_instruction=SYSTEM_PROMPT,
         tools=[_tools],
     )
@@ -184,18 +193,15 @@ def send_message(
     contents = _build_history(history or [])
 
     # 既存の会話履歴を引き継いでチャットセッションを開始
-    chat = model.start_chat(history=contents)
+    # responder を start_chat に渡すことで、Gemini のツール呼び出しが自動処理される。
+    chat = model.start_chat(history=contents, responder=afc_responder)
 
     route_data: dict[str, Any] | None = None
     places_data: list[dict[str, Any]] | None = None
 
     # メッセージを送信。Gemini がツール呼び出しを必要と判断した場合、
     # afc_responder により自動的に search_places / calculate_route が実行される。
-    response = chat.send_message(
-        message,
-        tools=[_tools],
-        automatic_function_calling=afc_responder,
-    )
+    response = chat.send_message(message)
 
     # チャット履歴を走査し、Function Calling の実行結果を抽出する。
     # Gemini が複数回ツールを呼ぶ可能性があるため、最後の結果で上書きする。
