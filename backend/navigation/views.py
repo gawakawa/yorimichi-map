@@ -1,3 +1,15 @@
+"""navigation API のビュー（エンドポイント実装）。
+
+chat:
+  フロントエンドからのメッセージを Vertex AI Gemini に送信し、
+  Automatic Function Calling により search_places / calculate_route が自動実行される。
+  AIの応答テキストに加え、ルートデータやスポット情報があればまとめて返却する。
+
+return_route:
+  行きのルート情報（origin, destination, waypoints）を受け取り、
+  出発地⇔目的地を入れ替え・経由地を逆順にして Routes API で帰り道を計算する。
+"""
+
 from __future__ import annotations
 
 import logging
@@ -23,7 +35,11 @@ logger = logging.getLogger(__name__)
 
 
 def _attach_deep_link(route_data: dict[str, Any]) -> dict[str, Any]:
-    """ルートデータに Google Maps ディープリンクURLを付与する。"""
+    """ルートデータに Google Maps ディープリンクURLを付与する。
+
+    ルート計算結果に google_maps_url フィールドを追加して返す。
+    このURLをタップ/クリックすると Google Maps アプリでナビが起動する。
+    """
     route_data["google_maps_url"] = generate_google_maps_url(
         origin=route_data["origin"],
         destination=route_data["destination"],
@@ -40,6 +56,14 @@ def _attach_deep_link(route_data: dict[str, Any]) -> dict[str, Any]:
 )
 @api_view(["POST"])
 def chat(request: Request) -> Response:
+    """AI チャットエンドポイント。
+
+    処理フロー:
+    1. リクエストからメッセージと会話履歴を取得
+    2. Gemini にメッセージを送信（Function Calling で API が自動呼び出しされる）
+    3. ルートデータがあれば Google Maps ディープリンクを付与
+    4. AI応答テキスト + ルート + スポットをまとめて返却
+    """
     serializer = ChatRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -57,6 +81,7 @@ def chat(request: Request) -> Response:
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
+    # ルート計算成功時 → ディープリンクを付与 / エラー時 → null にする
     if route_data and "error" not in route_data:
         route_data = _attach_deep_link(route_data)
     elif route_data and "error" in route_data:
@@ -79,9 +104,17 @@ def chat(request: Request) -> Response:
 )
 @api_view(["POST"])
 def return_route(request: Request) -> Response:
+    """帰路ルート生成エンドポイント。
+
+    行きのルート情報をそのまま受け取り、以下の変換を行って Routes API を再呼び出しする:
+    - origin ⇔ destination を入れ替え
+    - waypoints の順序を反転（逆順）
+    AI は介さず、確定的にルートを計算する。
+    """
     serializer = ReturnRouteRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
+    # 行きの destination を帰りの origin に、行きの origin を帰りの destination に入れ替え
     origin: str = serializer.validated_data["destination"]
     destination: str = serializer.validated_data["origin"]
     waypoints: list[str] = list(reversed(serializer.validated_data["waypoints"]))
