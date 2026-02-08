@@ -93,6 +93,7 @@
               root = ./.;
               fileset = lib.fileset.unions [
                 ./yorimichi_map_backend
+                ./navigation
                 ./manage.py
               ];
             };
