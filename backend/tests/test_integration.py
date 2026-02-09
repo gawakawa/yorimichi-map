@@ -38,6 +38,7 @@ from django.conf import settings  # noqa: E402
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.integration
 class TestPlacesAPI:
     """Google Places API (New) の疎通テスト。"""
 
@@ -86,6 +87,7 @@ class TestPlacesAPI:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.integration
 class TestRoutesAPI:
     """Google Routes API v2 の疎通テスト。"""
 
@@ -136,6 +138,7 @@ class TestRoutesAPI:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.integration
 class TestGeminiAPI:
     """Vertex AI Gemini の疎通テスト。"""
 
@@ -270,6 +273,7 @@ class TestDjangoEndpoints:
         assert data["status"] == "ok"
         print(f"\n[Health Check] 成功: {data}")
 
+    @pytest.mark.integration
     def test_chat_endpoint(self, client) -> None:
         """チャットエンドポイントが正常に応答することを確認する。"""
         if not settings.GOOGLE_CLOUD_PROJECT:
@@ -292,6 +296,7 @@ class TestDjangoEndpoints:
         assert "reply" in data
         print(f"\n[Chat API] 成功: {data['reply'][:100]}...")
 
+    @pytest.mark.integration
     def test_return_route_endpoint(self, client) -> None:
         """帰りルート計算エンドポイントが正常に応答することを確認する。"""
         if not settings.MAPS_API_KEY:

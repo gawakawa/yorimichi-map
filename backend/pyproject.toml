@@ -24,5 +24,9 @@ dev = [
     "ty>=0.0.13",
 ]
 
+[tool.pytest.ini_options]
+markers = ["integration: 外部API疎通テスト（CI環境ではスキップ）"]
+addopts = "-m 'not integration'"
+
 [tool.ty.src]
 exclude = ["manage.py", "tests/", "yorimichi_map_backend/"]
