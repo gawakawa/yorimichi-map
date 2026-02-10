@@ -152,6 +152,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # Google Maps API
 MAPS_API_KEY = os.environ.get("MAPS_API_KEY", "")
+PLACES_API_TIMEOUT = int(os.environ.get("PLACES_API_TIMEOUT", "10"))
+ROUTES_API_TIMEOUT = int(os.environ.get("ROUTES_API_TIMEOUT", "15"))
 
 # Vertex AI (Gemini)
 GOOGLE_CLOUD_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")

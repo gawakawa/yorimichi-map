@@ -23,6 +23,15 @@ PLACES_API_URL = "https://places.googleapis.com/v1/places:searchText"
 ROUTES_API_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
 
+def _get_api_key() -> str | None:
+    """API キーを取得し、未設定の場合はエラーログを記録して None を返す。"""
+    api_key = settings.MAPS_API_KEY
+    if not api_key:
+        logger.error("MAPS_API_KEY is not configured")
+        return None
+    return api_key
+
+
 def search_places(
     location_query: str, place_type: str = "restaurant"
 ) -> list[dict[str, Any]] | dict[str, str]:
@@ -39,9 +48,11 @@ def search_places(
         - minRating=4.0（星4以上の高評価のみ）
         - maxResultCount=3（最大3件）
     """
-    api_key = settings.MAPS_API_KEY
+    api_key = _get_api_key()
     if not api_key:
-        return {"error": "MAPS_API_KEY が設定されていません"}
+        return {
+            "error": "サービスの設定に問題があります。管理者にお問い合わせください。"
+        }
 
     # レスポンスに含めるフィールドを指定（FieldMask）
     headers = {
@@ -65,10 +76,21 @@ def search_places(
 
     try:
         response = requests.post(
-            PLACES_API_URL, json=payload, headers=headers, timeout=10
+            PLACES_API_URL,
+            json=payload,
+            headers=headers,
+            timeout=settings.PLACES_API_TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code == 429:
+            logger.warning("Places API rate limit exceeded")
+            return {
+                "error": "リクエストが集中しています。しばらく待ってから再度お試しください。"
+            }
+        logger.exception("Places API request failed")
+        return {"error": "スポット検索に失敗しました。ネットワークを確認してください。"}
     except requests.RequestException:
         logger.exception("Places API request failed")
         return {"error": "スポット検索に失敗しました。ネットワークを確認してください。"}
@@ -114,9 +136,11 @@ def calculate_route(
         - extraComputations: TOLLS（高速道路料金を算出）
         - departureTime: 現在時刻+5分（リアルタイム交通情報の取得用）
     """
-    api_key = settings.MAPS_API_KEY
+    api_key = _get_api_key()
     if not api_key:
-        return {"error": "MAPS_API_KEY が設定されていません"}
+        return {
+            "error": "サービスの設定に問題があります。管理者にお問い合わせください。"
+        }
 
     headers = {
         "Content-Type": "application/json",
@@ -153,10 +177,25 @@ def calculate_route(
 
     try:
         response = requests.post(
-            ROUTES_API_URL, json=payload, headers=headers, timeout=15
+            ROUTES_API_URL,
+            json=payload,
+            headers=headers,
+            timeout=settings.ROUTES_API_TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code == 429:
+            logger.warning("Routes API rate limit exceeded")
+            return {
+                "error": "リクエストが集中しています。しばらく待ってから再度お試しください。",
+                "error_type": "rate_limit",
+            }
+        logger.exception("Routes API request failed")
+        return {
+            "error": "ルート計算に失敗しました。ネットワークを確認してください。",
+            "error_type": "api_failure",
+        }
     except requests.RequestException:
         logger.exception("Routes API request failed")
         return {

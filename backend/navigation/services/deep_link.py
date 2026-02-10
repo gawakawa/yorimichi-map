@@ -44,7 +44,9 @@ def generate_google_maps_url(
     }
 
     # 経由地がある場合、パイプ(|)区切りで waypoints パラメータに追加
+    # Google Maps は括弧などの特殊文字をそのまま受け付けるため、
+    # パイプのみを区切りとし、地名自体はエンコードしない
     if waypoints:
-        params["waypoints"] = "|".join(quote(wp, safe="") for wp in waypoints)
+        params["waypoints"] = "|".join(waypoints)
 
     return f"{base_url}?{urlencode(params, quote_via=quote)}"

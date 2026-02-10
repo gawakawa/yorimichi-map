@@ -172,8 +172,13 @@ def send_message(
 
     max_history = int(os.environ.get("GEMINI_MAX_HISTORY_LENGTH", "10"))
     if history and len(history) > max_history:
+        original_length = len(history)
         history = history[-max_history:]
-        logger.info("Conversation history truncated to %d messages", max_history)
+        logger.info(
+            "Conversation history truncated from %d to %d messages",
+            original_length,
+            max_history,
+        )
 
     # Gemini 2.5 Pro モデルを生成（システムプロンプトとツールを設定）
     model = GenerativeModel(
@@ -201,7 +206,15 @@ def send_message(
 
     # メッセージを送信。Gemini がツール呼び出しを必要と判断した場合、
     # afc_responder により自動的に search_places / calculate_route が実行される。
-    response = chat.send_message(message)
+    try:
+        response = chat.send_message(message)
+    except Exception:
+        logger.exception("Gemini send_message failed (possible function calling loop)")
+        return (
+            "申し訳ありません。処理中にエラーが発生しました。内容を変えて再度お試しください。",
+            None,
+            None,
+        )
 
     # チャット履歴を走査し、Function Calling の実行結果を抽出する。
     # Gemini が複数回ツールを呼ぶ可能性があるため、最後の結果で上書きする。
