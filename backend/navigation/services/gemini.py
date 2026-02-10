@@ -143,6 +143,53 @@ def _build_history(history: list[dict[str, str]]) -> list[Content]:
     return contents
 
 
+def _extract_function_results(
+    history: list[Content],
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]] | None]:
+    """チャット履歴から Function Calling の実行結果を抽出する。
+
+    Gemini が複数回ツールを呼ぶ可能性があるため、最後の結果で上書きする。
+
+    Returns:
+        (route_data_or_none, places_data_or_none) のタプル
+    """
+    route_data: dict[str, Any] | None = None
+    places_data: list[dict[str, Any]] | None = None
+
+    for content in history:
+        for part in content.parts:
+            fn_response = part.function_response
+            if fn_response is None:
+                continue
+            name = fn_response.name
+            result = dict(fn_response.response) if fn_response.response else {}
+
+            if name == "calculate_route" and "error" not in result:
+                route_data = result
+            elif name == "search_places" and isinstance(result, list):
+                places_data = result
+            elif name == "search_places" and "error" not in result:
+                places_data = result.get("results", [])
+
+    return route_data, places_data
+
+
+def _truncate_history(
+    history: list[dict[str, str]],
+    max_length: int,
+) -> list[dict[str, str]]:
+    """会話履歴を最大長に切り詰め、ログを記録する。"""
+    if len(history) > max_length:
+        original_length = len(history)
+        history = history[-max_length:]
+        logger.info(
+            "Conversation history truncated from %d to %d messages",
+            original_length,
+            max_length,
+        )
+    return history
+
+
 def send_message(
     message: str,
     history: list[dict[str, str]] | None = None,
@@ -151,11 +198,11 @@ def send_message(
 
     処理フロー:
       1. Vertex AI SDK を初期化（初回のみ）
-      2. Gemini 1.5 Pro モデルをシステムプロンプト付きで生成
-      3. AutomaticFunctionCallingResponder を設定（最大5回の自動呼び出し）
+      2. Gemini 2.5 Pro モデルをシステムプロンプト付きで生成
+      3. AutomaticFunctionCallingResponder を設定
       4. フロントエンドの会話履歴を Content 形式に変換してチャットセッションを開始
-      5. ユーザーメッセージを送信 → Gemini が必要に応じて search_places / calculate_route を自動実行
-      6. チャット履歴から Function Calling の結果（ルート・スポット）を抽出
+      5. ユーザーメッセージを送信 → Gemini が必要に応じてツールを自動実行
+      6. チャット履歴から Function Calling の結果を抽出
       7. AI 応答テキスト + ルートデータ + スポットデータのタプルを返却
 
     Args:
@@ -171,14 +218,8 @@ def send_message(
     _ensure_initialized()
 
     max_history = int(os.environ.get("GEMINI_MAX_HISTORY_LENGTH", "10"))
-    if history and len(history) > max_history:
-        original_length = len(history)
-        history = history[-max_history:]
-        logger.info(
-            "Conversation history truncated from %d to %d messages",
-            original_length,
-            max_history,
-        )
+    if history:
+        history = _truncate_history(history, max_history)
 
     # Gemini 2.5 Pro モデルを生成（システムプロンプトとツールを設定）
     model = GenerativeModel(
@@ -189,9 +230,9 @@ def send_message(
 
     # Automatic Function Calling: Gemini がツール呼び出しを判断したら、
     # SDK が自動的に対応する Python 関数を実行し、結果を Gemini に返す。
-    # max_automatic_function_calls=5 で無限ループを防止。
+    max_fc = int(os.environ.get("GEMINI_MAX_FUNCTION_CALLS", "5"))
     afc_responder = AutomaticFunctionCallingResponder(
-        max_automatic_function_calls=5,
+        max_automatic_function_calls=max_fc,
     )
 
     # フロントエンドの会話履歴を Vertex AI の Content 形式に変換
@@ -201,14 +242,11 @@ def send_message(
     # responder を start_chat に渡すことで、Gemini のツール呼び出しが自動処理される。
     chat = model.start_chat(history=contents, responder=afc_responder)
 
-    route_data: dict[str, Any] | None = None
-    places_data: list[dict[str, Any]] | None = None
-
     # メッセージを送信。Gemini がツール呼び出しを必要と判断した場合、
     # afc_responder により自動的に search_places / calculate_route が実行される。
     try:
         response = chat.send_message(message)
-    except Exception:
+    except (ValueError, RuntimeError):
         logger.exception("Gemini send_message failed (possible function calling loop)")
         return (
             "申し訳ありません。処理中にエラーが発生しました。内容を変えて再度お試しください。",
@@ -216,23 +254,7 @@ def send_message(
             None,
         )
 
-    # チャット履歴を走査し、Function Calling の実行結果を抽出する。
-    # Gemini が複数回ツールを呼ぶ可能性があるため、最後の結果で上書きする。
-    for content in chat.history:
-        for part in content.parts:
-            fn_response = part.function_response
-            if fn_response is None:
-                continue
-            name = fn_response.name
-            result = dict(fn_response.response) if fn_response.response else {}
-
-            if name == "calculate_route" and "error" not in result:
-                route_data = result
-            elif name == "search_places" and isinstance(result, list):
-                places_data = result
-            elif name == "search_places" and "error" not in result:
-                places_data = result.get("results", [])
-
+    route_data, places_data = _extract_function_results(chat.history)
     reply_text = response.text if response.text else ""
 
     return reply_text, route_data, places_data

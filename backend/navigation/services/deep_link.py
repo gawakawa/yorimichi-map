@@ -14,6 +14,23 @@ from __future__ import annotations
 
 from urllib.parse import quote, urlencode
 
+_MAX_WAYPOINT_LENGTH = 200
+
+
+def _sanitize_place_name(name: str) -> str:
+    """地名文字列をサニタイズする。
+
+    パイプ文字を除去し、長さと文字パターンを検証する。
+    """
+    sanitized = name.replace("|", "").strip()
+    if not sanitized:
+        msg = f"空の地名が指定されました: {name!r}"
+        raise ValueError(msg)
+    if len(sanitized) > _MAX_WAYPOINT_LENGTH:
+        msg = f"地名が長すぎます（{_MAX_WAYPOINT_LENGTH}文字以内）: {sanitized!r}"
+        raise ValueError(msg)
+    return sanitized
+
 
 def generate_google_maps_url(
     origin: str,
@@ -32,21 +49,23 @@ def generate_google_maps_url(
 
     Returns:
         Google Maps を開くための完全な URL 文字列。
+
+    Raises:
+        ValueError: 地名が不正な場合。
     """
     base_url = "https://www.google.com/maps/dir/"
 
     # Google Maps URL パラメータ（api=1 は URL スキーマのバージョン指定）
     params: dict[str, str] = {
         "api": "1",
-        "origin": origin,
-        "destination": destination,
+        "origin": _sanitize_place_name(origin),
+        "destination": _sanitize_place_name(destination),
         "travelmode": "driving",
     }
 
     # 経由地がある場合、パイプ(|)区切りで waypoints パラメータに追加
-    # Google Maps は括弧などの特殊文字をそのまま受け付けるため、
-    # パイプのみを区切りとし、地名自体はエンコードしない
     if waypoints:
-        params["waypoints"] = "|".join(waypoints)
+        sanitized = [_sanitize_place_name(wp) for wp in waypoints]
+        params["waypoints"] = "|".join(sanitized)
 
     return f"{base_url}?{urlencode(params, quote_via=quote)}"

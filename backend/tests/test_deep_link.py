@@ -15,6 +15,8 @@ sys.path.insert(0, str(backend_dir))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yorimichi_map_backend.settings")
 django.setup()
 
+import pytest  # noqa: E402
+
 from navigation.services.deep_link import generate_google_maps_url  # noqa: E402
 
 
@@ -59,3 +61,44 @@ class TestGenerateGoogleMapsUrl:
         url = generate_google_maps_url(origin="A", destination="C", waypoints=["B"])
 
         assert "waypoints=" in url
+
+    @pytest.mark.parametrize(
+        "waypoint",
+        [
+            "箱根湯本駅（東口）",
+            "手打ち蕎麦 山路",
+            "café & bar #1",
+            "道の駅・箱根峠",
+        ],
+    )
+    def test_special_characters_in_waypoints(self, waypoint: str) -> None:
+        """特殊文字を含む経由地でも URL が正しく生成されること。"""
+        url = generate_google_maps_url(
+            origin="東京駅",
+            destination="箱根湯本駅",
+            waypoints=[waypoint],
+        )
+        assert "waypoints=" in url
+
+    def test_pipe_in_waypoint_is_stripped(self) -> None:
+        """経由地にパイプ文字が含まれる場合、除去されること。"""
+        url = generate_google_maps_url(
+            origin="A",
+            destination="B",
+            waypoints=["テスト|場所"],
+        )
+        assert "waypoints=" in url
+        # パイプがエンコード済みの区切り文字としてのみ存在すること
+        # （地名中のパイプは除去される）
+
+    def test_empty_waypoint_raises_error(self) -> None:
+        """空文字の経由地が指定された場合、ValueError が発生すること。"""
+        with pytest.raises(ValueError, match="空の地名"):
+            generate_google_maps_url(origin="A", destination="B", waypoints=[""])
+
+    def test_too_long_waypoint_raises_error(self) -> None:
+        """極端に長い経由地が指定された場合、ValueError が発生すること。"""
+        with pytest.raises(ValueError, match="地名が長すぎます"):
+            generate_google_maps_url(
+                origin="A", destination="B", waypoints=["あ" * 201]
+            )

@@ -111,6 +111,22 @@ class TestSearchPlaces:
         assert "error" in result
 
     @patch("navigation.services.google_maps.requests.post")
+    def test_rate_limit_error(self, mock_post: Mock) -> None:
+        """429 レート制限エラー時に専用メッセージを返すこと。"""
+        mock_response = Mock()
+        mock_response.status_code = 429
+        http_error = requests.HTTPError("429 Too Many Requests")
+        http_error.response = mock_response
+        mock_response.raise_for_status.side_effect = http_error
+        mock_post.return_value = mock_response
+
+        settings.MAPS_API_KEY = "test-api-key"
+        result = search_places("東京駅")
+
+        assert isinstance(result, dict)
+        assert "リクエストが集中" in result["error"]
+
+    @patch("navigation.services.google_maps.requests.post")
     def test_missing_fields_handled(self, mock_post: Mock) -> None:
         """APIレスポンスにフィールドが欠けていてもデフォルト値で処理できること。"""
         mock_response = Mock()
@@ -230,6 +246,23 @@ class TestCalculateRoute:
         result = calculate_route("東京駅", "横浜駅")
 
         assert "error" in result
+
+    @patch("navigation.services.google_maps.requests.post")
+    def test_rate_limit_error(self, mock_post: Mock) -> None:
+        """429 レート制限エラー時に専用メッセージを返すこと。"""
+        mock_response = Mock()
+        mock_response.status_code = 429
+        http_error = requests.HTTPError("429 Too Many Requests")
+        http_error.response = mock_response
+        mock_response.raise_for_status.side_effect = http_error
+        mock_post.return_value = mock_response
+
+        settings.MAPS_API_KEY = "test-api-key"
+        result = calculate_route("東京駅", "横浜駅")
+
+        assert "error" in result
+        assert "リクエストが集中" in result["error"]
+        assert result["error_type"] == "rate_limit"
 
     @patch("navigation.services.google_maps.requests.post")
     def test_no_toll_info(self, mock_post: Mock) -> None:
