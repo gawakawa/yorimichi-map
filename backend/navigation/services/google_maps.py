@@ -45,8 +45,8 @@ def search_places(
         スポット情報のリスト。エラー時は {"error": "..."} の辞書を返す。
 
     フィルタ条件:
-        - minRating=4.0（星4以上の高評価のみ）
-        - maxResultCount=3（最大3件）
+        - minRating=settings.PLACES_MIN_RATING（デフォルト: 星4以上の高評価のみ）
+        - maxResultCount=settings.PLACES_MAX_RESULTS（デフォルト: 最大3件）
     """
     api_key = _get_api_key()
     if not api_key:
@@ -70,8 +70,8 @@ def search_places(
 
     payload = {
         "textQuery": f"{place_type} near {location_query}",
-        "minRating": 4.0,
-        "maxResultCount": 3,
+        "minRating": settings.PLACES_MIN_RATING,
+        "maxResultCount": settings.PLACES_MAX_RESULTS,
     }
 
     try:

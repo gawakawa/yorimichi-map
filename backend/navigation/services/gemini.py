@@ -35,6 +35,7 @@ from vertexai.preview.generative_models import (
     GenerativeModel,
 )
 
+from ..exceptions import GeminiFunctionCallingError
 from . import google_maps
 
 logger = logging.getLogger(__name__)
@@ -246,7 +247,7 @@ def send_message(
     # afc_responder により自動的に search_places / calculate_route が実行される。
     try:
         response = chat.send_message(message)
-    except (ValueError, RuntimeError):
+    except (ValueError, GeminiFunctionCallingError, RuntimeError):
         logger.exception("Gemini send_message failed (possible function calling loop)")
         return (
             "申し訳ありません。処理中にエラーが発生しました。内容を変えて再度お試しください。",

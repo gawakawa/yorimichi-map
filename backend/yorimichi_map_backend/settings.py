@@ -156,6 +156,13 @@ CORS_ALLOWED_ORIGINS = [
 MAPS_API_KEY = os.environ.get("MAPS_API_KEY", "")
 PLACES_API_TIMEOUT = int(os.environ.get("PLACES_API_TIMEOUT", "10"))
 ROUTES_API_TIMEOUT = int(os.environ.get("ROUTES_API_TIMEOUT", "15"))
+PLACES_MIN_RATING = float(os.environ.get("PLACES_MIN_RATING", "4.0"))
+PLACES_MAX_RESULTS = int(os.environ.get("PLACES_MAX_RESULTS", "3"))
+
+# リクエストサイズ制限（メモリリーク防止）
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.environ.get("DATA_UPLOAD_MAX_MEMORY_SIZE", "5242880")
+)  # 5MB
 
 # Vertex AI (Gemini)
 GOOGLE_CLOUD_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")

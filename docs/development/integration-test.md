@@ -80,3 +80,20 @@ direnv exec . python -m pytest tests/test_integration.py::TestDjangoEndpoints -v
 ### `ALLOWED_HOSTS` エラー
 
 Django テストクライアントは `testserver` ホストを使用する。テストコード内で `ALLOWED_HOSTS` を `["*"]` に設定するフィクスチャで対応済み。
+
+## API レート制限・クォータ情報
+
+本番運用時は以下のレート制限・クォータに注意すること。
+
+| API | 制限項目 | デフォルト上限 | 備考 |
+|-----|---------|--------------|------|
+| Places API (New) | QPD (Queries Per Day) | プロジェクトの課金プランに依存 | [料金ページ](https://developers.google.com/maps/documentation/places/web-service/usage-and-billing)参照 |
+| Routes API | QPD (Queries Per Day) | プロジェクトの課金プランに依存 | [料金ページ](https://developers.google.com/maps/documentation/routes/usage-and-billing)参照 |
+| Vertex AI Gemini | RPM (Requests Per Minute) | モデル・リージョンにより異なる | [クォータページ](https://cloud.google.com/vertex-ai/generative-ai/docs/quotas)参照 |
+| Vertex AI Gemini | TPM (Tokens Per Minute) | モデル・リージョンにより異なる | 同上 |
+
+### クォータ超過時の対処
+
+- Google Cloud Console の「IAM と管理」→「割り当て」からクォータ使用状況を確認
+- 必要に応じてクォータ引き上げをリクエスト
+- アプリケーションレベルのレート制限（Django-ratelimit 等）の導入も検討
