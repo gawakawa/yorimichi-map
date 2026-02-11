@@ -1,0 +1,30 @@
+name: "Terraform CI"
+
+on:
+  workflow_call:
+
+jobs:
+  tests:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: gawakawa
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Flake check
+        run: nix flake check

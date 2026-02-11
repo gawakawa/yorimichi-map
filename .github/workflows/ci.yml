@@ -45,129 +45,26 @@ jobs:
   nix-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.root == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GH_TOKEN }}
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: gawakawa
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Flake check
-        run: nix flake check
+    uses: ./.github/workflows/nix-ci.yml
+    secrets: inherit
 
   frontend-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GH_TOKEN }}
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: gawakawa
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Check
-        run: nix flake check
-
-      - name: Test
-        run: nix shell .#ci -c bash -c "pnpm install --frozen-lockfile && pnpm test"
-
-      - name: Build container
-        run: nix build .#container
-
-      - name: Authenticate to Google Cloud
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: github-actions@yorimichi-map-485411.iam.gserviceaccount.com
-
-      - name: Push container image
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
-          nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }}
+    uses: ./.github/workflows/frontend-ci.yml
+    secrets: inherit
 
   backend-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GH_TOKEN }}
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: gawakawa
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Check
-        run: nix flake check
-
-      - name: Test
-        run: nix shell .#ci -c uv run pytest
-
-      - name: Build container
-        run: nix build .#container
-
-      - name: Authenticate to Google Cloud
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: github-actions@yorimichi-map-485411.iam.gserviceaccount.com
-
-      - name: Push container image
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
-          nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/backend:${{ github.sha }}
+    uses: ./.github/workflows/backend-ci.yml
+    secrets: inherit
 
   terraform-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.terraform == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: terraform
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GH_TOKEN }}
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: gawakawa
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Flake check
-        run: nix flake check
+    uses: ./.github/workflows/terraform-ci.yml
+    secrets: inherit
 
   ci-success:
     needs: [nix-check, frontend-check, backend-check, terraform-check]

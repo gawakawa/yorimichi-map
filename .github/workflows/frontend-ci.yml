@@ -1,0 +1,53 @@
+name: "Frontend CI"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: gawakawa
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Check
+        run: nix flake check
+
+      - name: Test
+        run: nix shell .#ci -c bash -c "pnpm install --frozen-lockfile && pnpm test"
+
+      - name: Build container
+        run: nix build .#container
+
+      - name: Authenticate to Google Cloud
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: github-actions@yorimichi-map-485411.iam.gserviceaccount.com
+
+      - name: Push container image
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+          nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }}
