@@ -68,9 +68,11 @@ Use the `/pr` skill to create pull requests with Japanese descriptions.
 
 ## CI/CD
 
-GitHub Actions workflows run Nix-based checks:
+GitHub Actions 統合 CI ワークフロー (`ci.yml`):
 
-- `nix-ci.yml` - root flake check
-- `frontend-ci.yml` - format, lint, test
-- `backend-ci.yml` - format, lint, test
-- `terraform-ci.yml` - flake check
+- `detect-changes` - 変更されたコンポーネントを検知
+- `nix-check` - root flake check
+- `frontend-check` - format, lint, test, container build, deploy (main only)
+- `backend-check` - format, lint, test, container build, deploy (main only)
+- `terraform-check` - flake check
+- `ci-success` - branch protection 用の集約ゲート

@@ -1,0 +1,77 @@
+name: "CI"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      root: ${{ steps.filter.outputs.root }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            root:
+              - 'flake.nix'
+              - 'flake.lock'
+              - '*.md'
+              - '.envrc'
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+            terraform:
+              - 'terraform/**'
+
+  nix-check:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.root == 'true'
+    uses: ./.github/workflows/nix-ci.yml
+    secrets: inherit
+
+  frontend-check:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend-ci.yml
+    secrets: inherit
+
+  backend-check:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/backend-ci.yml
+    secrets: inherit
+
+  terraform-check:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.terraform == 'true'
+    uses: ./.github/workflows/terraform-ci.yml
+    secrets: inherit
+
+  ci-success:
+    needs: [nix-check, frontend-check, backend-check, terraform-check]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify all checks passed
+        run: exit 1
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
