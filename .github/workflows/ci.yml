@@ -72,9 +72,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - run: exit 1
-        if: |
-          (needs.nix-check.result != 'success' && needs.nix-check.result != 'skipped') ||
-          (needs.frontend-check.result != 'success' && needs.frontend-check.result != 'skipped') ||
-          (needs.backend-check.result != 'success' && needs.backend-check.result != 'skipped') ||
-          (needs.terraform-check.result != 'success' && needs.terraform-check.result != 'skipped')
+      - name: Verify all checks passed
+        run: exit 1
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
