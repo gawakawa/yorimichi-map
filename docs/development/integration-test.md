@@ -58,7 +58,7 @@ direnv exec . python -m pytest tests/test_integration.py::TestDjangoEndpoints -v
 ## テスト一覧
 
 | テスト | 必要な環境変数 | 内容 |
-|--------|---------------|------|
+| -------- | --------------- | ------ |
 | `TestDeepLink` | なし | Google Maps URL 生成の動作確認 |
 | `TestPlacesAPI` | `MAPS_API_KEY` | Places API (New) でスポット検索 |
 | `TestRoutesAPI` | `MAPS_API_KEY` | Routes API v2 でルート計算 |
@@ -86,7 +86,7 @@ Django テストクライアントは `testserver` ホストを使用する。�
 本番運用時は以下のレート制限・クォータに注意すること。
 
 | API | 制限項目 | デフォルト上限 | 備考 |
-|-----|---------|--------------|------|
+| ----- | --------- | -------------- | ------ |
 | Places API (New) | QPD (Queries Per Day) | プロジェクトの課金プランに依存 | [料金ページ](https://developers.google.com/maps/documentation/places/web-service/usage-and-billing)参照 |
 | Routes API | QPD (Queries Per Day) | プロジェクトの課金プランに依存 | [料金ページ](https://developers.google.com/maps/documentation/routes/usage-and-billing)参照 |
 | Vertex AI Gemini | RPM (Requests Per Minute) | モデル・リージョンにより異なる | [クォータページ](https://cloud.google.com/vertex-ai/generative-ai/docs/quotas)参照 |
