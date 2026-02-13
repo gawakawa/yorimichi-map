@@ -33,7 +33,8 @@ jobs:
             root:
               - 'flake.nix'
               - 'flake.lock'
-              - '*.md'
+              - 'flakes/**'
+              - '**/*.md'
               - '.envrc'
             frontend:
               - 'frontend/**'
@@ -42,7 +43,7 @@ jobs:
             terraform:
               - 'terraform/**'
 
-  nix-check:
+  root-check:
     needs: detect-changes
     if: needs.detect-changes.outputs.root == 'true'
     uses: ./.github/workflows/nix-ci.yml
@@ -67,7 +68,7 @@ jobs:
     secrets: inherit
 
   ci-success:
-    needs: [nix-check, frontend-check, backend-check, terraform-check]
+    needs: [root-check, frontend-check, backend-check, terraform-check]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

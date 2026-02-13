@@ -71,7 +71,7 @@ Use the `/pr` skill to create pull requests with Japanese descriptions.
 GitHub Actions 統合 CI ワークフロー (`ci.yml`):
 
 - `detect-changes` - 変更されたコンポーネントを検知
-- `nix-check` - root flake check
+- `root-check` - root flake check
 - `frontend-check` - format, lint, test, container build, deploy (main only)
 - `backend-check` - format, lint, test, container build, deploy (main only)
 - `terraform-check` - flake check
