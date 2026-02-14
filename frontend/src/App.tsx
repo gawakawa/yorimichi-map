@@ -1,11 +1,10 @@
 import './index.css';
+import { AppLayout } from './components/Layout/AppLayout';
+import { ChatPanel } from './components/Chat/ChatPanel';
+import { MapPanel } from './components/Map/MapPanel';
 
 function App() {
-	return (
-		<div>
-			<h1>寄り道マップ</h1>
-		</div>
-	);
+	return <AppLayout chatPanel={<ChatPanel />} mapPanel={<MapPanel />} />;
 }
 
 export default App;

@@ -1,0 +1,29 @@
+.app-layout {
+	display: grid;
+	grid-template-columns: 1fr 1.2fr;
+	height: 100vh;
+	gap: 0;
+}
+
+.chat-column {
+	display: flex;
+	flex-direction: column;
+	border-right: 1px solid #e0e0e0;
+	background-color: #fafafa;
+}
+
+.map-column {
+	display: flex;
+	flex-direction: column;
+}
+
+@media (max-width: 768px) {
+	.app-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.chat-column {
+		border-right: none;
+		border-bottom: 1px solid #e0e0e0;
+	}
+}
