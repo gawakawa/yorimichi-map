@@ -89,9 +89,7 @@ export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
 						)}
 					</button>
 				</div>
-				<div className="mt-2 px-1 text-xs text-gray-400">
-					Enter で送信 • Shift + Enter で改行
-				</div>
+				<div className="mt-2 px-1 text-xs text-gray-400">Enter で送信 • Shift + Enter で改行</div>
 			</div>
 		</div>
 	);

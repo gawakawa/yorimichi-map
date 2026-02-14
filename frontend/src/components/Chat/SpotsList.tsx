@@ -25,9 +25,7 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 						/>
 					</svg>
 				</div>
-				<h3 className="mb-3 text-xl font-semibold text-gray-800">
-					ドライブ先を教えてください
-				</h3>
+				<h3 className="mb-3 text-xl font-semibold text-gray-800">ドライブ先を教えてください</h3>
 				<p className="mb-8 max-w-md text-center text-sm leading-relaxed text-gray-600">
 					行きたい場所や寄り道したいスポットを教えてください。
 					<br />
@@ -64,12 +62,7 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 							<p className="mb-2 text-sm text-gray-600">{spot.description}</p>
 							<div className="flex items-center gap-3 text-xs text-gray-500">
 								<span className="flex items-center gap-1">
-									<svg
-										className="h-4 w-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
+									<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
 											strokeLinecap="round"
 											strokeLinejoin="round"
