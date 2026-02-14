@@ -19,6 +19,11 @@ export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
 	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+		// IME変換中（日本語入力中）はEnterを無視
+		if (e.nativeEvent.isComposing) {
+			return;
+		}
+
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			handleSend();
