@@ -11,6 +11,19 @@
 - `direnv allow` - 開発環境の有効化
 - `pnpm install` - 依存関係のインストール
 
+### 環境変数
+
+Google Maps API キーを設定する必要がある。
+
+1. `.env.local.example` をコピーして `.env.local` を作成
+2. [Google Cloud Console](https://console.cloud.google.com/google/maps-apis) で API キーを取得
+3. `.env.local` に API キーを設定
+
+```bash
+cp .env.local.example .env.local
+# .env.local を編集して VITE_GOOGLE_MAPS_API_KEY を設定
+```
+
 ### コマンド
 
 開発にあたっては以下のようなコマンドが利用可能。
@@ -52,3 +65,5 @@ CI では以下のチェックが実行される。
 - React 19 - UI ライブラリ
 - Vite - ビルドツール
 - TanStack Query - データフェッチング
+- @vis.gl/react-google-maps - Google Maps 統合
+- TypeScript - 型安全性

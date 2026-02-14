@@ -1,0 +1,51 @@
+.route-summary {
+	padding: 20px;
+	background-color: #f8f9fa;
+	border-top: 1px solid #e0e0e0;
+}
+
+.summary-title {
+	margin: 0 0 16px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+}
+
+.summary-items {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.summary-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+}
+
+.summary-icon {
+	font-size: 20px;
+	width: 24px;
+	text-align: center;
+}
+
+.summary-label {
+	color: #666;
+	min-width: 80px;
+}
+
+.summary-value {
+	font-weight: 600;
+	color: #333;
+}
+
+@media (max-width: 768px) {
+	.summary-items {
+		gap: 10px;
+	}
+
+	.summary-item {
+		font-size: 13px;
+	}
+}

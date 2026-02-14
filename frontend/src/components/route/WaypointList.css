@@ -1,0 +1,73 @@
+.waypoint-list {
+	padding: 20px;
+	background-color: #ffffff;
+	border-top: 1px solid #e0e0e0;
+}
+
+.waypoint-title {
+	margin: 0 0 16px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+}
+
+.waypoint-items {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.waypoint-item {
+	display: flex;
+	gap: 12px;
+	padding: 12px;
+	background-color: #f8f9fa;
+	border-radius: 8px;
+}
+
+.waypoint-number {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	background-color: #fbbc04;
+	color: #fff;
+	border-radius: 50%;
+	font-weight: bold;
+	font-size: 16px;
+	flex-shrink: 0;
+}
+
+.waypoint-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+}
+
+.waypoint-name {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+}
+
+.waypoint-address {
+	font-size: 13px;
+	color: #666;
+}
+
+.waypoint-rating {
+	font-size: 13px;
+	color: #666;
+}
+
+@media (max-width: 768px) {
+	.waypoint-item {
+		padding: 10px;
+	}
+
+	.waypoint-name {
+		font-size: 15px;
+	}
+}

@@ -1,41 +1,36 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { MapView } from './components/map/MapView';
+import { RouteSummary } from './components/route/RouteSummary';
+import { WaypointList } from './components/route/WaypointList';
+import { NavigationButton } from './components/actions/NavigationButton';
+import { ReturnRouteButton } from './components/actions/ReturnRouteButton';
+import { useRouteData } from './hooks/useRouteData';
 import './App.css';
 
 function App() {
-	const [count, setCount] = useState(0);
-
-	const { status } = useQuery({
-		queryKey: ['health'],
-		queryFn: async () => {
-			const res = await fetch('http://localhost:8000/api/health/');
-			if (!res.ok) throw new Error('API error');
-			return res.json();
-		},
-	});
+	const { data, isLoading, error } = useRouteData();
 
 	return (
-		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
+		<div className="app-container">
+			<div className="left-panel">
+				<div className="placeholder">
+					<h2>チャット機能</h2>
+					<p>実装予定</p>
+				</div>
 			</div>
-			<h1>Vite + React</h1>
-			<div className="card">
-				<button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
+			<div className="right-panel">
+				<MapView />
+				{!isLoading && !error && data && (
+					<>
+						<RouteSummary route={data.route} />
+						<WaypointList waypoints={data.waypoints} />
+						<div className="action-buttons">
+							<NavigationButton route={data.route} />
+							<ReturnRouteButton />
+						</div>
+					</>
+				)}
 			</div>
-			<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-			<p>API: {status}</p>
-		</>
+		</div>
 	);
 }
 

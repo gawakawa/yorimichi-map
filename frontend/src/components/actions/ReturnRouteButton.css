@@ -1,0 +1,35 @@
+.return-route-button {
+	width: 100%;
+	min-height: 44px;
+	padding: 12px 24px;
+	background-color: #ffffff;
+	color: #4285f4;
+	border: 2px solid #4285f4;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.return-route-button:hover {
+	background-color: #f0f4ff;
+	border-color: #3367d6;
+	color: #3367d6;
+}
+
+.return-route-button:active {
+	background-color: #e0ebff;
+	border-color: #2851a3;
+	color: #2851a3;
+}
+
+@media (max-width: 768px) {
+	.return-route-button {
+		font-size: 15px;
+	}
+}

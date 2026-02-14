@@ -20,6 +20,7 @@
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
+        "x86_64-darwin"
       ];
 
       imports = [
@@ -167,7 +168,7 @@
           pre-commit.settings.hooks = {
             treefmt.enable = true;
             oxlint = {
-              enable = true;
+              enable = pkgs.stdenv.isLinux;
               name = "oxlint";
               entry = "${pkgs.oxlint}/bin/oxlint --type-aware";
               files = "\\.(ts|tsx|js|jsx)$";
