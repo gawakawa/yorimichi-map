@@ -1,22 +1,38 @@
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import type { LatLng } from '../../utils/polyline';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import type { LatLngBoundsExpression } from 'leaflet';
+import type { Route } from '../../api/navigation';
+import { decodePolyline } from '../../utils/polyline';
 
 const DEFAULT_ZOOM = 14;
+const DEFAULT_CENTER: [number, number] = [35.6812, 139.7671]; // Tokyo Station
 
-// Mock route: Tokyo Station -> Ginza -> Tsukiji (sample coordinates)
-const MOCK_ROUTE: LatLng[] = [
-	[35.6812, 139.7671], // Tokyo Station
-	[35.6753, 139.7642], // Yaesu
-	[35.6717, 139.7649], // Kyobashi
-	[35.6687, 139.7639], // Ginza
-	[35.6654, 139.7707], // Tsukiji
-];
+function MapUpdater({ routePoints }: { routePoints: [number, number][] }) {
+	const map = useMap();
 
-export function RouteMap() {
-	const routePoints = MOCK_ROUTE;
-	const startPoint = routePoints[0];
-	const endPoint = routePoints[routePoints.length - 1];
-	const center = startPoint;
+	useEffect(() => {
+		if (routePoints.length > 0) {
+			const bounds: LatLngBoundsExpression = routePoints.map(
+				(p) => [p[0], p[1]] as [number, number],
+			);
+			map.fitBounds(bounds, { padding: [50, 50] });
+		}
+	}, [map, routePoints]);
+
+	return null;
+}
+
+interface RouteMapProps {
+	route: Route | null;
+}
+
+export function RouteMap({ route }: RouteMapProps) {
+	const routePoints = route ? decodePolyline(route.encoded_polyline) : [];
+	const hasRoute = routePoints.length > 0;
+
+	const startPoint = hasRoute ? routePoints[0] : null;
+	const endPoint = hasRoute ? routePoints[routePoints.length - 1] : null;
+	const center = startPoint ?? DEFAULT_CENTER;
 
 	return (
 		<MapContainer
@@ -25,6 +41,7 @@ export function RouteMap() {
 			className="h-full w-full"
 			style={{ height: '100%', width: '100%' }}
 		>
+			<MapUpdater routePoints={routePoints} />
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -42,7 +59,7 @@ export function RouteMap() {
 				</Marker>
 			)}
 
-			{routePoints.length > 0 && (
+			{hasRoute && (
 				<Polyline
 					positions={routePoints.map((p) => [p[0], p[1]] as [number, number])}
 					color="blue"

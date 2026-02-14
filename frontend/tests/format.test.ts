@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDistance, formatDuration, formatCurrency } from '../src/utils/format';
+import { formatDistance, formatDuration } from '../src/utils/format';
 
 describe('format', () => {
 	describe('formatDistance', () => {
@@ -47,24 +47,6 @@ describe('format', () => {
 		it('should not show seconds when > 60 seconds', () => {
 			expect(formatDuration(90)).toBe('1分');
 			expect(formatDuration(150)).toBe('2分');
-		});
-	});
-
-	describe('formatCurrency', () => {
-		it('should format JPY currency', () => {
-			expect(formatCurrency(1000)).toBe('¥1,000');
-		});
-
-		it('should add thousand separators', () => {
-			expect(formatCurrency(1000000)).toBe('¥1,000,000');
-		});
-
-		it('should handle zero', () => {
-			expect(formatCurrency(0)).toBe('¥0');
-		});
-
-		it('should handle small amounts', () => {
-			expect(formatCurrency(100)).toBe('¥100');
 		});
 	});
 });

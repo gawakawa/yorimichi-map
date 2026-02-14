@@ -1,11 +1,11 @@
+import { useEffect, useRef } from 'react';
 import { useChat } from '../../hooks/useChat';
-import { chatNavigationAPI } from '../../api/navigation';
+import { chatNavigationAPI, type Route } from '../../api/navigation';
 import { APIError } from '../../api/errors';
 import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
-import { useEffect, useRef } from 'react';
 
 const MOCK_SPOTS = [
 	{
@@ -31,7 +31,11 @@ const MOCK_SPOTS = [
 	},
 ];
 
-export function ChatPanel() {
+interface ChatPanelProps {
+	onRouteReceived?: (route: Route | null) => void;
+}
+
+export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +59,11 @@ export function ChatPanel() {
 			const response = await chatNavigationAPI.sendMessage(message, history);
 
 			addMessage(response.reply, 'assistant');
+
+			// Notify parent if route is received
+			if (response.route && onRouteReceived) {
+				onRouteReceived(response.route);
+			}
 		} catch (error) {
 			console.error('Failed to send message:', error);
 			if (error instanceof APIError) {
