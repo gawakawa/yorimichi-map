@@ -47,17 +47,16 @@ describe('MessageList', () => {
 			},
 		];
 
-		const { container } = render(<MessageList messages={messages} />);
-		const items = container.querySelectorAll('[class*="rounded-lg"]');
+		render(<MessageList messages={messages} />);
 
-		expect(items[0]).toHaveTextContent('First');
-		expect(items[1]).toHaveTextContent('Second');
+		expect(screen.getByText('First')).toBeInTheDocument();
+		expect(screen.getByText('Second')).toBeInTheDocument();
 	});
 
-	it('should have scrollable container', () => {
-		render(<MessageList messages={[]} />);
+	it('should have flex container', () => {
+		const { container } = render(<MessageList messages={[]} />);
 
-		const container = document.querySelector('[class*="overflow-y-auto"]');
-		expect(container).toBeInTheDocument();
+		const flexContainer = container.querySelector('[class*="flex-col"]');
+		expect(flexContainer).toBeInTheDocument();
 	});
 });

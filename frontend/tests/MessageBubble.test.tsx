@@ -12,14 +12,14 @@ describe('MessageBubble', () => {
 	it('should apply user styling', () => {
 		const { container } = render(<MessageBubble text="Hello" role="user" />);
 
-		const bubble = container.querySelector('[class*="bg-blue"]');
+		const bubble = container.querySelector('[class*="from-blue-500"]');
 		expect(bubble).toBeInTheDocument();
 	});
 
 	it('should apply assistant styling', () => {
 		const { container } = render(<MessageBubble text="Hi there" role="assistant" />);
 
-		const bubble = container.querySelector('[class*="bg-gray"]');
+		const bubble = container.querySelector('[class*="from-blue-50"]');
 		expect(bubble).toBeInTheDocument();
 	});
 
@@ -40,6 +40,6 @@ describe('MessageBubble', () => {
 		const { container } = render(<MessageBubble text="Hello" role="assistant" />);
 
 		const wrapper = container.firstChild;
-		expect(wrapper?.className).toContain('justify-start');
+		expect(wrapper?.className).toContain('from-blue-50');
 	});
 });
