@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useChat } from '../../hooks/useChat';
 import { chatNavigationAPI, type Route } from '../../api/navigation';
 import { APIError } from '../../api/errors';
@@ -22,6 +23,30 @@ export function ChatPanel({
 	onRouteReceived,
 }: ChatPanelProps) {
 	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
+	const [isSearching, setIsSearching] = useState(false);
+
+	const handleSearch = async () => {
+		setErrorMessage(null);
+		setIsSearching(true);
+
+		try {
+			const response = await chatNavigationAPI.getReturnRoute({
+				origin,
+				destination,
+				waypoints: [],
+			});
+			onRouteReceived(response.route);
+		} catch (err) {
+			console.error('Failed to search route:', err);
+			if (err instanceof APIError) {
+				setErrorMessage(getErrorMessage(err.status));
+			} else {
+				setErrorMessage('ルート検索に失敗しました。');
+			}
+		} finally {
+			setIsSearching(false);
+		}
+	};
 
 	const handleSend = async (message: string) => {
 		addMessage(message, 'user');
@@ -71,6 +96,8 @@ export function ChatPanel({
 					destination={destination}
 					onOriginChange={onOriginChange}
 					onDestinationChange={onDestinationChange}
+					onSearch={handleSearch}
+					isSearching={isSearching}
 				/>
 			</div>
 			<div className="flex-1 space-y-4 overflow-y-auto p-4">
