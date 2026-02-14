@@ -120,7 +120,7 @@ resource "google_cloud_run_v2_service" "backend" {
 
       env {
         name  = "DJANGO_ALLOWED_HOSTS"
-        value = ".run.app,localhost,127.0.0.1"
+        value = ".run.app,localhost,127.0.0.1,.${var.domain_name}"
       }
 
       env {
@@ -150,7 +150,7 @@ resource "google_cloud_run_v2_service" "backend" {
 
       env {
         name  = "CORS_ALLOWED_ORIGINS"
-        value = google_cloud_run_v2_service.frontend.uri
+        value = "https://${var.subdomain}.${var.domain_name},${google_cloud_run_v2_service.frontend.uri}"
       }
 
       startup_probe {

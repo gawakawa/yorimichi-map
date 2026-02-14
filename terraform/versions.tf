@@ -11,5 +11,9 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 7.16"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.17"
+    }
   }
 }
