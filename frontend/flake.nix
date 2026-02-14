@@ -11,7 +11,6 @@
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    mcp-servers-nix.url = "github:natsukium/mcp-servers-nix";
   };
 
   outputs =

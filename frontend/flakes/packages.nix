@@ -1,4 +1,4 @@
-{ flake-parts-lib, inputs, ... }:
+{ flake-parts-lib, ... }:
 {
   options.perSystem = flake-parts-lib.mkPerSystemOption (
     { lib, ... }:
@@ -66,27 +66,6 @@
             }
           ];
         }).config.environment.etc."nginx/nginx.conf".source;
-
-      mcpConfig =
-        inputs.mcp-servers-nix.lib.mkConfig
-          (import inputs.mcp-servers-nix.inputs.nixpkgs {
-            inherit system;
-          })
-          {
-            programs.nixos.enable = true;
-            settings.servers.chrome-devtools = {
-              command = "${pkgs.lib.getExe' pkgs.nodejs_24 "npx"}";
-              args = [
-                "-y"
-                "chrome-devtools-mcp@latest"
-                "--executablePath"
-                "${pkgs.lib.getExe pkgs.ungoogled-chromium}"
-              ];
-              env = {
-                PATH = "${pkgs.nodejs_24}/bin:${pkgs.bash}/bin";
-              };
-            };
-          };
     in
     {
       ciPackages = with pkgs; [
@@ -101,8 +80,6 @@
         };
 
         inherit frontend;
-
-        mcp-config = mcpConfig;
 
         container = nix2container.buildImage {
           name = "yorimichi-map-frontend";
