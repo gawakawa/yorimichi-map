@@ -218,5 +218,6 @@ __marimo__/
 # Nix / direnv
 .direnv
 result
+result-container
 .mcp.json
 .pre-commit-config.yaml

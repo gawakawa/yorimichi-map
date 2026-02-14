@@ -143,5 +143,6 @@ vite.config.ts.timestamp-*
 
 .direnv
 result
+result-container
 .mcp.json
 .pre-commit-config.yaml
