@@ -119,7 +119,7 @@ resource "google_cloud_run_v2_service" "backend" {
 
       env {
         name  = "DJANGO_ALLOWED_HOSTS"
-        value = ".run.app,localhost"
+        value = ".run.app,localhost,127.0.0.1"
       }
 
       env {
@@ -159,7 +159,8 @@ resource "google_cloud_run_v2_service" "backend" {
         }
         initial_delay_seconds = 0
         period_seconds        = 10
-        failure_threshold     = 3
+        timeout_seconds       = 5
+        failure_threshold     = 6
       }
     }
 
