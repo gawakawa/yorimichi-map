@@ -1,4 +1,5 @@
 import { useChat } from '../../hooks/useChat';
+import { chatNavigationAPI } from '../../api/navigation';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
@@ -30,8 +31,23 @@ const MOCK_SPOTS = [
 export function ChatPanel() {
 	const { messages, addMessage } = useChat();
 
-	const handleSend = (message: string) => {
+	const handleSend = async (message: string) => {
 		addMessage(message, 'user');
+
+		try {
+			// Convert messages to API format (text -> content)
+			const history = messages.map((m) => ({
+				role: m.role,
+				content: m.text,
+			}));
+
+			const response = await chatNavigationAPI.sendMessage(message, history);
+
+			addMessage(response.reply, 'assistant');
+		} catch (error) {
+			console.error('Failed to send message:', error);
+			addMessage('エラーが発生しました。もう一度試してください。', 'assistant');
+		}
 	};
 
 	const handleSpotSelect = (spot: (typeof MOCK_SPOTS)[0]) => {
