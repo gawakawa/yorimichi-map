@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
+import { config } from './config';
 
 function App() {
 	const [count, setCount] = useState(0);
@@ -10,7 +11,7 @@ function App() {
 	const { status } = useQuery({
 		queryKey: ['health'],
 		queryFn: async () => {
-			const res = await fetch('http://localhost:8000/api/health/');
+			const res = await fetch(`${config.apiBaseUrl}/api/health/`);
 			if (!res.ok) throw new Error('API error');
 			return res.json();
 		},
