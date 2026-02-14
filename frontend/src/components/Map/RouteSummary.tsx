@@ -1,10 +1,9 @@
-import { formatDistance, formatDuration, formatCurrency } from '../../utils/format';
+import { formatDistance, formatDuration } from '../../utils/format';
 import { ActionButtons } from './ActionButtons';
 
 interface RouteSummaryProps {
 	distance?: number;
 	duration?: number;
-	fare?: number;
 	title?: string;
 	onSearch?: () => void;
 	onDetails?: () => void;
@@ -14,7 +13,6 @@ interface RouteSummaryProps {
 export function RouteSummary({
 	distance = 2500,
 	duration = 900,
-	fare = 210,
 	title = 'おすすめルート',
 	onSearch = () => console.log('Search'),
 	onDetails = () => console.log('Details'),
@@ -34,11 +32,6 @@ export function RouteSummary({
 					<div className="flex items-center justify-between">
 						<span className="text-gray-600">所要時間</span>
 						<span className="font-medium">{formatDuration(duration)}</span>
-					</div>
-
-					<div className="flex items-center justify-between border-t border-gray-200 pt-2">
-						<span className="text-gray-600">料金</span>
-						<span className="font-bold text-blue-600">{formatCurrency(fare)}</span>
 					</div>
 				</div>
 			</div>

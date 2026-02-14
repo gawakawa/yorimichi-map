@@ -26,7 +26,3 @@ export function formatDuration(seconds: number): string {
 
 	return `${hours}時間${remainingMinutes}分`;
 }
-
-export function formatCurrency(amount: number): string {
-	return `¥${amount.toLocaleString('ja-JP')}`;
-}
