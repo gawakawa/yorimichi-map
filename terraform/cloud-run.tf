@@ -4,6 +4,12 @@ resource "google_project_service" "run" {
   disable_on_destroy = false
 }
 
+# Vertex AI API
+resource "google_project_service" "aiplatform" {
+  service            = "aiplatform.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Cloud Run runtime service account
 resource "google_service_account" "cloudrun" {
   account_id   = "cloudrun-runtime"
@@ -14,6 +20,13 @@ resource "google_service_account" "cloudrun" {
 resource "google_project_iam_member" "cloudrun_artifact_reader" {
   project = var.project_id
   role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.cloudrun.email}"
+}
+
+# Grant Vertex AI User role to Cloud Run service account
+resource "google_project_iam_member" "cloudrun_vertex_ai_user" {
+  project = var.project_id
+  role    = "roles/aiplatform.user"
   member  = "serviceAccount:${google_service_account.cloudrun.email}"
 }
 
@@ -108,6 +121,26 @@ resource "google_cloud_run_v2_service" "backend" {
             version = "latest"
           }
         }
+      }
+
+      env {
+        name = "MAPS_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.maps_api_key.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
+      }
+
+      env {
+        name  = "CORS_ALLOWED_ORIGINS"
+        value = google_cloud_run_v2_service.frontend.uri
       }
 
       startup_probe {
