@@ -58,4 +58,5 @@ jobs:
         run: |
           gcloud run deploy yorimichi-map-backend \
             --image asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/backend:${{ github.sha }} \
-            --region asia-northeast1
+            --region asia-northeast1 \
+            --verbosity=debug
