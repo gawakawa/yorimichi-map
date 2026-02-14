@@ -143,5 +143,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = int(
 )  # 5MB
 
 # Vertex AI (Gemini)
-GOOGLE_CLOUD_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
-GOOGLE_CLOUD_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "asia-northeast1")
+GOOGLE_CLOUD_PROJECT = "yorimichi-map-485411"
+GOOGLE_CLOUD_LOCATION = "asia-northeast1"
