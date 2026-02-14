@@ -40,6 +40,16 @@ export interface ChatResponse {
 	places?: Place[] | null;
 }
 
+export interface ReturnRouteRequest {
+	origin: string;
+	destination: string;
+	waypoints: string[];
+}
+
+export interface ReturnRouteResponse {
+	route: Route;
+}
+
 export const chatNavigationAPI = {
 	async sendMessage(message: string, history: ChatMessage[]): Promise<ChatResponse> {
 		const url = `${config.apiBaseUrl}/api/navigation/chat/`;
@@ -53,6 +63,24 @@ export const chatNavigationAPI = {
 				message,
 				history,
 			}),
+		});
+
+		if (!response.ok) {
+			throw new Error(`API error: ${response.status} ${response.statusText}`);
+		}
+
+		return response.json();
+	},
+
+	async getReturnRoute(req: ReturnRouteRequest): Promise<ReturnRouteResponse> {
+		const url = `${config.apiBaseUrl}/api/navigation/return-route/`;
+
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(req),
 		});
 
 		if (!response.ok) {
