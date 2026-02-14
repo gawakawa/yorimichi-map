@@ -7,12 +7,10 @@ interface MessageListProps {
 
 export function MessageList({ messages }: MessageListProps) {
 	return (
-		<div className="flex-1 overflow-y-auto">
-			<div className="flex flex-col gap-3">
-				{messages.map((message) => (
-					<MessageBubble key={message.id} text={message.text} role={message.role} />
-				))}
-			</div>
+		<div className="flex flex-col">
+			{messages.map((message) => (
+				<MessageBubble key={message.id} text={message.text} role={message.role} />
+			))}
 		</div>
 	);
 }

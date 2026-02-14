@@ -5,6 +5,7 @@ import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
+import { useEffect, useRef } from 'react';
 
 const MOCK_SPOTS = [
 	{
@@ -32,6 +33,12 @@ const MOCK_SPOTS = [
 
 export function ChatPanel() {
 	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
+	const messagesEndRef = useRef<HTMLDivElement>(null);
+
+	// メッセージが追加されたら自動的に最下部にスクロール
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+	}, [messages, isLoading]);
 
 	const handleSend = async (message: string) => {
 		addMessage(message, 'user');
@@ -99,52 +106,72 @@ export function ChatPanel() {
 				</div>
 			</div>
 
-			{/* メッセージエリア */}
+			{/* メッセージエリア - スクロール可能 */}
 			<div className="flex-1 overflow-y-auto bg-white">
-				{error && (
-					<div className="mx-6 my-4">
+				<div className="min-h-full">
+					{error && (
+						<div className="mx-6 my-4">
+							<div
+								className="flex items-start gap-3 rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-4 shadow-sm"
+								role="alert"
+								aria-live="polite"
+							>
+								<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500">
+									<svg
+										className="h-5 w-5 text-white"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+								</div>
+								<div className="flex-1">
+									<p className="m-0 mb-1 text-sm font-semibold text-red-900">
+										エラーが発生しました
+									</p>
+									<p className="m-0 text-sm text-red-800">{error}</p>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{messages.length === 0 ? (
+						<SpotsList spots={MOCK_SPOTS} onSelect={handleSpotSelect} />
+					) : (
+						<MessageList messages={messages} />
+					)}
+
+					{isLoading && (
 						<div
-							className="flex items-start gap-3 rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-4 shadow-sm"
-							role="alert"
+							className="flex flex-col items-center justify-center py-8"
 							aria-live="polite"
+							aria-label="読み込み中"
 						>
-							<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500">
-								<svg
-									className="h-5 w-5 text-white"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
+							<div className="relative">
+								<div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-transparent bg-gradient-to-br from-blue-500 to-purple-600" />
+								<div className="absolute inset-0 flex items-center justify-center">
+									<div className="h-6 w-6 rounded-full bg-white" />
+								</div>
 							</div>
-							<div className="flex-1">
-								<p className="m-0 mb-1 text-sm font-semibold text-red-900">エラーが発生しました</p>
-								<p className="m-0 text-sm text-red-800">{error}</p>
-							</div>
+							<p className="mt-4 text-sm font-medium text-gray-600">考え中...</p>
 						</div>
-					</div>
-				)}
-				<MessageList messages={messages} />
-				{messages.length === 0 && <SpotsList spots={MOCK_SPOTS} onSelect={handleSpotSelect} />}
-				{isLoading && (
-					<div className="flex flex-col items-center justify-center py-8" aria-live="polite" aria-label="読み込み中">
-						<div className="relative">
-							<div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-transparent bg-gradient-to-br from-blue-500 to-purple-600" />
-							<div className="absolute inset-0 flex items-center justify-center">
-								<div className="h-6 w-6 rounded-full bg-white" />
-							</div>
-						</div>
-						<p className="mt-4 text-sm font-medium text-gray-600">考え中...</p>
-					</div>
-				)}
+					)}
+
+					{/* 自動スクロール用の要素 */}
+					<div ref={messagesEndRef} />
+				</div>
 			</div>
-			<ChatInput onSend={handleSend} isLoading={isLoading} />
+
+			{/* 入力欄 - 下部に固定 */}
+			<div className="flex-shrink-0">
+				<ChatInput onSend={handleSend} isLoading={isLoading} />
+			</div>
 		</div>
 	);
 }
