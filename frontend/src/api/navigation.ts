@@ -86,14 +86,30 @@ const MOCK_PLACES: Place[] = [
 	},
 ];
 
+// Global flag for testing (allows bypassing mock API in tests)
+let forceUseMockAPI = true;
+
+export function __setUseMockAPI(value: boolean) {
+	forceUseMockAPI = value;
+}
+
 function useMockAPI(): boolean {
-	// Check if VITE_USE_MOCK_API is explicitly set to 'false'
+	// Check if VITE_USE_MOCK_API environment variable is explicitly set
 	const mockAPIEnv = import.meta.env.VITE_USE_MOCK_API;
+
+	// If explicitly set to 'false', use real API
 	if (mockAPIEnv === 'false') {
 		return false;
 	}
-	// Use mock API if env is set to 'true' or if no API base URL is configured
-	return mockAPIEnv === 'true' || !config.apiBaseUrl || config.apiBaseUrl.includes('undefined');
+
+	// If explicitly set to 'true', use mock API
+	if (mockAPIEnv === 'true') {
+		return true;
+	}
+
+	// Default: use mock API in development (controlled by forceUseMockAPI flag)
+	// This allows seamless transition from mock to real API when VITE_USE_MOCK_API=false
+	return forceUseMockAPI;
 }
 
 async function getMockResponse(message: string): Promise<ChatResponse> {
