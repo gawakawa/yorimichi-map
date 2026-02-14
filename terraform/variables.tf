@@ -16,18 +16,27 @@ variable "zone" {
   default     = "asia-northeast1-a"
 }
 
-variable "billing_account_id" {
-  description = "GCP billing account ID (format: XXXXXX-XXXXXX-XXXXXX)"
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token with Zone:DNS:Edit and Zone:Zone:Read permissions"
   type        = string
   sensitive   = true
 }
 
-variable "frontend_image_tag" {
-  description = "Frontend container image tag (commit SHA)"
+variable "domain_name" {
+  description = "Root domain name"
   type        = string
+  default     = "i0ta.dev"
 }
 
-variable "backend_image_tag" {
-  description = "Backend container image tag (commit SHA)"
+variable "subdomain" {
+  description = "Subdomain prefix for the application"
   type        = string
+  default     = "yorimichi"
 }
+
+variable "alert_email" {
+  description = "Email address for monitoring alerts"
+  type        = string
+  default     = ""
+}
+

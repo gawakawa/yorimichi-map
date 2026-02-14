@@ -9,14 +9,24 @@ dependencies = [
     "django-cors-headers>=4.9.0",
     "djangorestframework>=3.16.1",
     "drf-spectacular>=0.29.0",
+    "google-cloud-aiplatform>=1.136.0",
     "gunicorn>=23.0.0",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
 ]
+
+[tool.setuptools.packages.find]
+include = ["yorimichi_map_backend*", "navigation*"]
 
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
     "ty>=0.0.13",
 ]
+
+[tool.pytest.ini_options]
+markers = ["integration: 外部API疎通テスト（CI環境ではスキップ）"]
+addopts = "-m 'not integration'"
 
 [tool.ty.src]
 exclude = ["manage.py", "tests/", "yorimichi_map_backend/"]

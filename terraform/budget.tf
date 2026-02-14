@@ -1,13 +1,9 @@
-data "google_billing_account" "account" {
-  billing_account = var.billing_account_id
-}
-
 data "google_project" "project" {
   project_id = var.project_id
 }
 
 resource "google_billing_budget" "monthly" {
-  billing_account = data.google_billing_account.account.id
+  billing_account = data.google_project.project.billing_account
   display_name    = "yorimichi-map Monthly Budget"
 
   budget_filter {

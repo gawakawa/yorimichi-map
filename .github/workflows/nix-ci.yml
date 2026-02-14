@@ -1,24 +1,7 @@
 name: "Nix CI"
 
 on:
-  pull_request:
-    paths:
-      - "flake.nix"
-      - "flake.lock"
-      - "*.md"
-      - ".envrc"
-  push:
-    branches:
-      - main
-    paths:
-      - "flake.nix"
-      - "flake.lock"
-      - "*.md"
-      - ".envrc"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   tests:

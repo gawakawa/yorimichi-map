@@ -1,18 +1,8 @@
-name: "Frontend CI"
+name: "Frontend"
 
 on:
-  pull_request:
-    paths:
-      - "frontend/**"
-  push:
-    branches:
-      - main
-    paths:
-      - "frontend/**"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -51,14 +41,22 @@ jobs:
         run: nix build .#container
 
       - name: Authenticate to Google Cloud
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: github-actions@yorimichi-map-485411.iam.gserviceaccount.com
 
       - name: Push container image
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
           nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+        run: |
+          gcloud run deploy yorimichi-map-frontend \
+            --image asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }} \
+            --region asia-northeast1 \
+            --verbosity=debug

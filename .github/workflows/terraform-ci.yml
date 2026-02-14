@@ -1,18 +1,7 @@
 name: "Terraform CI"
 
 on:
-  pull_request:
-    paths:
-      - "terraform/**"
-  push:
-    branches:
-      - main
-    paths:
-      - "terraform/**"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   tests:

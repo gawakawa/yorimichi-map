@@ -5,3 +5,7 @@ provider "google" {
   billing_project       = var.project_id
   user_project_override = true
 }
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}

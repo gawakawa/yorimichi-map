@@ -4,6 +4,12 @@ resource "google_project_service" "run" {
   disable_on_destroy = false
 }
 
+# Vertex AI API
+resource "google_project_service" "aiplatform" {
+  service            = "aiplatform.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Cloud Run runtime service account
 resource "google_service_account" "cloudrun" {
   account_id   = "cloudrun-runtime"
@@ -14,6 +20,13 @@ resource "google_service_account" "cloudrun" {
 resource "google_project_iam_member" "cloudrun_artifact_reader" {
   project = var.project_id
   role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.cloudrun.email}"
+}
+
+# Grant Vertex AI User role to Cloud Run service account
+resource "google_project_iam_member" "cloudrun_vertex_ai_user" {
+  project = var.project_id
+  role    = "roles/aiplatform.user"
   member  = "serviceAccount:${google_service_account.cloudrun.email}"
 }
 
@@ -28,7 +41,8 @@ resource "google_cloud_run_v2_service" "frontend" {
     service_account = google_service_account.cloudrun.email
 
     containers {
-      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/frontend:${var.frontend_image_tag}"
+      # Initial placeholder image; actual deployments are done via gcloud run deploy in GitHub Actions
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/frontend:initial"
 
       ports {
         container_port = 8080
@@ -48,7 +62,8 @@ resource "google_cloud_run_v2_service" "frontend" {
         }
         initial_delay_seconds = 0
         period_seconds        = 10
-        failure_threshold     = 3
+        timeout_seconds       = 5
+        failure_threshold     = 6
       }
     }
 
@@ -64,6 +79,13 @@ resource "google_cloud_run_v2_service" "frontend" {
   }
 
   depends_on = [google_project_service.run]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      template[0].revision,
+    ]
+  }
 }
 
 # Backend Cloud Run service
@@ -77,7 +99,8 @@ resource "google_cloud_run_v2_service" "backend" {
     service_account = google_service_account.cloudrun.email
 
     containers {
-      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/backend:${var.backend_image_tag}"
+      # Initial placeholder image; actual deployments are done via gcloud run deploy in GitHub Actions
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/backend:initial"
 
       ports {
         container_port = 8000
@@ -97,7 +120,7 @@ resource "google_cloud_run_v2_service" "backend" {
 
       env {
         name  = "DJANGO_ALLOWED_HOSTS"
-        value = ".run.app,localhost"
+        value = ".run.app,localhost,127.0.0.1,.${var.domain_name}"
       }
 
       env {
@@ -110,6 +133,26 @@ resource "google_cloud_run_v2_service" "backend" {
         }
       }
 
+      env {
+        name = "MAPS_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.maps_api_key.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
+      }
+
+      env {
+        name  = "CORS_ALLOWED_ORIGINS"
+        value = "https://${var.subdomain}.${var.domain_name},${google_cloud_run_v2_service.frontend.uri}"
+      }
+
       startup_probe {
         http_get {
           path = "/api/health/"
@@ -117,7 +160,8 @@ resource "google_cloud_run_v2_service" "backend" {
         }
         initial_delay_seconds = 0
         period_seconds        = 10
-        failure_threshold     = 3
+        timeout_seconds       = 5
+        failure_threshold     = 6
       }
     }
 
@@ -133,6 +177,13 @@ resource "google_cloud_run_v2_service" "backend" {
   }
 
   depends_on = [google_project_service.run]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      template[0].revision,
+    ]
+  }
 }
 
 # Public access for frontend

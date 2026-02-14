@@ -1,23 +1,42 @@
 name: "Update Flake Lock"
 
 on:
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
   schedule:
-    - cron: "0 15 * * 5" # Run every Saturday at 00:00 JST (Friday 15:00 UTC)
-
-permissions:
-  contents: write
-  pull-requests: write
+    - cron: "0 15 1 * *" # 1st of each month, 00:00 JST
 
 jobs:
-  update-flake-lock:
-    strategy:
-      matrix:
-        directory: [frontend, backend, terraform]
-    uses: gawakawa/.github/.github/workflows/update-flake-lock.yml@main
-    with:
-      auto-merge: true
-      path-to-flake-dir: ${{ matrix.directory }}
-      branch: update-flake-lock-${{ matrix.directory }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  update-flake-locks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Update flake.lock files
+        id: update
+        uses: gawakawa/update-flake-lock@multi-flake
+        with:
+          flakes: |
+            ./
+            ./frontend/
+            ./backend/
+            ./terraform/
+          pr-title: "⬆️ Update all flake.lock files"
+          pr-labels: dependencies
+          branch: update-flake-lock/all
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Enable auto-merge
+        if: steps.update.outputs.pull-request-number != ''
+        run: gh pr merge --auto --squash ${{ steps.update.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
