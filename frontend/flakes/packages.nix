@@ -48,6 +48,8 @@
               services.nginx = {
                 enable = true;
                 enableReload = true;
+                user = "nobody";
+                group = "nobody";
                 appendHttpConfig = ''
                   access_log /dev/stdout combined;
                 '';
