@@ -6,8 +6,6 @@ interface RouteSummaryProps {
 	duration?: number;
 	title?: string;
 	onSearch?: () => void;
-	onDetails?: () => void;
-	onShare?: () => void;
 }
 
 export function RouteSummary({
@@ -15,8 +13,6 @@ export function RouteSummary({
 	duration = 900,
 	title = 'おすすめルート',
 	onSearch = () => console.log('Search'),
-	onDetails = () => console.log('Details'),
-	onShare = () => console.log('Share'),
 }: RouteSummaryProps) {
 	return (
 		<div className="space-y-3 rounded-lg border border-gray-200 bg-white p-4">
@@ -36,7 +32,7 @@ export function RouteSummary({
 				</div>
 			</div>
 
-			<ActionButtons onSearch={onSearch} onDetails={onDetails} onShare={onShare} />
+			<ActionButtons onSearch={onSearch} />
 		</div>
 	);
 }
