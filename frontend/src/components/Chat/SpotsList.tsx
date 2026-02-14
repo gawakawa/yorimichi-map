@@ -1,14 +1,8 @@
-interface Spot {
-	id: string;
-	name: string;
-	description: string;
-	distance: number;
-	rating: number;
-}
+import type { MockSpot } from '../../mocks/spots';
 
 interface SpotsListProps {
-	spots: Spot[];
-	onSelect?: (spot: Spot) => void;
+	spots: MockSpot[];
+	onSelect?: (spot: MockSpot) => void;
 }
 
 export function SpotsList({ spots, onSelect }: SpotsListProps) {

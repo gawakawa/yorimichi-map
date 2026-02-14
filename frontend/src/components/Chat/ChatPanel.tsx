@@ -6,30 +6,7 @@ import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
-
-const MOCK_SPOTS = [
-	{
-		id: '1',
-		name: '銀座',
-		description: 'ショッピングエリア',
-		distance: 0.5,
-		rating: 4.5,
-	},
-	{
-		id: '2',
-		name: '築地市場',
-		description: '寿司と海鮮',
-		distance: 1.2,
-		rating: 4.8,
-	},
-	{
-		id: '3',
-		name: '浜離宮恩賜庭園',
-		description: '日本庭園',
-		distance: 1.8,
-		rating: 4.6,
-	},
-];
+import { MOCK_SPOTS } from '../../mocks/spots';
 
 interface ChatPanelProps {
 	onRouteReceived?: (route: Route | null) => void;
@@ -83,8 +60,8 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		}
 	};
 
-	const handleSpotSelect = (spot: (typeof MOCK_SPOTS)[0]) => {
-		console.log('Selected spot:', spot);
+	const handleSpotSelect = () => {
+		// TODO: スポット選択時の処理を実装
 	};
 
 	return (

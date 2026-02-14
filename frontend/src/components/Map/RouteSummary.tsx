@@ -16,9 +16,15 @@ export function RouteSummary({
 	duration = 900,
 	fare = 210,
 	title = 'おすすめルート',
-	onSearch = () => console.log('Search'),
-	onDetails = () => console.log('Details'),
-	onShare = () => console.log('Share'),
+	onSearch = () => {
+		// TODO: 検索処理を実装
+	},
+	onDetails = () => {
+		// TODO: 詳細表示処理を実装
+	},
+	onShare = () => {
+		// TODO: 共有処理を実装
+	},
 }: RouteSummaryProps) {
 	return (
 		<div className="space-y-4 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 p-5 shadow-sm">
