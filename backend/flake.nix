@@ -38,6 +38,7 @@
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
+        "x86_64-darwin"
       ];
 
       imports = [
@@ -147,7 +148,7 @@
             treefmt.enable = true;
             ruff.enable = true;
             ty = {
-              enable = true;
+              enable = pkgs.stdenv.isLinux;
               name = "ty";
               entry = "${pkgs.ty}/bin/ty check --project backend";
               files = "^backend/.*\\.py$";

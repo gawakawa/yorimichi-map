@@ -16,6 +16,7 @@
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
+        "x86_64-darwin"
       ];
 
       imports = [
@@ -50,7 +51,7 @@
             treefmt.enable = true;
             tflint.enable = true;
             terraform-docs = {
-              enable = true;
+              enable = pkgs.stdenv.isLinux;
               entry = "${pkgs.terraform-docs}/bin/terraform-docs markdown table --output-file README.md --output-mode inject terraform";
               files = "^terraform/.*\\.tf$";
               pass_filenames = false;
