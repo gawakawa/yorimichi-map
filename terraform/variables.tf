@@ -16,18 +16,3 @@ variable "zone" {
   default     = "asia-northeast1-a"
 }
 
-variable "billing_account_id" {
-  description = "GCP billing account ID (format: XXXXXX-XXXXXX-XXXXXX)"
-  type        = string
-  sensitive   = true
-}
-
-variable "frontend_image_tag" {
-  description = "Frontend container image tag (commit SHA)"
-  type        = string
-}
-
-variable "backend_image_tag" {
-  description = "Backend container image tag (commit SHA)"
-  type        = string
-}
