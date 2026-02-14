@@ -41,7 +41,8 @@ resource "google_cloud_run_v2_service" "frontend" {
     service_account = google_service_account.cloudrun.email
 
     containers {
-      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/frontend:${var.frontend_image_tag}"
+      # Initial placeholder image; actual deployments are done via gcloud run deploy in GitHub Actions
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/frontend:initial"
 
       ports {
         container_port = 8080
@@ -77,6 +78,13 @@ resource "google_cloud_run_v2_service" "frontend" {
   }
 
   depends_on = [google_project_service.run]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      template[0].revision,
+    ]
+  }
 }
 
 # Backend Cloud Run service
@@ -90,7 +98,8 @@ resource "google_cloud_run_v2_service" "backend" {
     service_account = google_service_account.cloudrun.email
 
     containers {
-      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/backend:${var.backend_image_tag}"
+      # Initial placeholder image; actual deployments are done via gcloud run deploy in GitHub Actions
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/yorimichi-map/backend:initial"
 
       ports {
         container_port = 8000
@@ -166,6 +175,13 @@ resource "google_cloud_run_v2_service" "backend" {
   }
 
   depends_on = [google_project_service.run]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      template[0].revision,
+    ]
+  }
 }
 
 # Public access for frontend

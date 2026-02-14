@@ -1,4 +1,4 @@
-name: "CI"
+name: "Main"
 
 on:
   pull_request:
@@ -49,16 +49,16 @@ jobs:
     uses: ./.github/workflows/nix-ci.yml
     secrets: inherit
 
-  frontend-check:
+  frontend:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
-    uses: ./.github/workflows/frontend-ci.yml
+    uses: ./.github/workflows/frontend.yml
     secrets: inherit
 
-  backend-check:
+  backend:
     needs: detect-changes
     if: needs.detect-changes.outputs.backend == 'true'
-    uses: ./.github/workflows/backend-ci.yml
+    uses: ./.github/workflows/backend.yml
     secrets: inherit
 
   terraform-check:
@@ -68,7 +68,7 @@ jobs:
     secrets: inherit
 
   ci-success:
-    needs: [root-check, frontend-check, backend-check, terraform-check]
+    needs: [root-check, frontend, backend, terraform-check]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

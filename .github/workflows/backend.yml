@@ -1,4 +1,4 @@
-name: "Frontend CI"
+name: "Backend"
 
 on:
   workflow_call:
@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: frontend
+        working-directory: backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -34,7 +34,7 @@ jobs:
         run: nix flake check
 
       - name: Test
-        run: nix shell .#ci -c bash -c "pnpm install --frozen-lockfile && pnpm test"
+        run: nix shell .#ci -c uv run pytest
 
       - name: Build container
         run: nix build .#container
@@ -50,4 +50,11 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
-          nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/frontend:${{ github.sha }}
+          nix run .#container.copyTo -- docker://asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/backend:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          gcloud run deploy yorimichi-map-backend \
+            --image asia-northeast1-docker.pkg.dev/yorimichi-map-485411/yorimichi-map/backend:${{ github.sha }} \
+            --region asia-northeast1

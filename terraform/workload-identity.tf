@@ -52,3 +52,17 @@ resource "google_service_account_iam_member" "github_actions_workload_identity" 
   role               = "roles/iam.workloadIdentityUser"
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/gawakawa/yorimichi-map"
 }
+
+# Cloud Run deploy permission for GitHub Actions
+resource "google_project_iam_member" "github_actions_run_developer" {
+  project = var.project_id
+  role    = "roles/run.developer"
+  member  = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# Allow GitHub Actions to act as Cloud Run runtime service account
+resource "google_service_account_iam_member" "github_actions_act_as_cloudrun" {
+  service_account_id = google_service_account.cloudrun.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
