@@ -48,9 +48,9 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 			<h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
 				おすすめスポット
 			</h3>
-			{spots.map((spot) => (
+			{spots.map((spot, index) => (
 				<button
-					key={spot.name}
+					key={`${spot.name}-${spot.address}-${index}`}
 					onClick={() => onSelect?.(spot)}
 					className="group w-full rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
 				>

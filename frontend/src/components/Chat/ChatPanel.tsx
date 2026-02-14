@@ -65,10 +65,6 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		}
 	};
 
-	const handleSpotSelect = () => {
-		// TODO: スポット選択時の処理を実装
-	};
-
 	return (
 		<div className="flex h-full flex-col">
 			{/* ヘッダー */}
@@ -133,7 +129,7 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 					)}
 
 					{messages.length === 0 ? (
-						<SpotsList spots={spots} onSelect={handleSpotSelect} />
+						<SpotsList spots={spots} />
 					) : (
 						<MessageList messages={messages} />
 					)}

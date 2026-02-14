@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import type { LatLngBoundsExpression } from 'leaflet';
 import type { Route } from '../../api/navigation';
@@ -27,11 +27,7 @@ interface RouteMapProps {
 }
 
 export function RouteMap({ route }: RouteMapProps) {
-	// パフォーマンス最適化: ルートポイントをメモ化
-	const routePoints = useMemo(
-		() => (route ? decodePolyline(route.encoded_polyline) : []),
-		[route?.encoded_polyline],
-	);
+	const routePoints = route ? decodePolyline(route.encoded_polyline) : [];
 
 	const hasRoute = routePoints.length > 0;
 

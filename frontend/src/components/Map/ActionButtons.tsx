@@ -9,7 +9,8 @@ export function ActionButtons({ onSearch, onDetails, onShare }: ActionButtonsPro
 		<div className="flex gap-2">
 			<button
 				onClick={onSearch}
-				className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-95"
+				disabled
+				className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-sm opacity-50 cursor-not-allowed"
 			>
 				<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -23,7 +24,8 @@ export function ActionButtons({ onSearch, onDetails, onShare }: ActionButtonsPro
 			</button>
 			<button
 				onClick={onDetails}
-				className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 active:scale-95"
+				disabled
+				className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 opacity-50 cursor-not-allowed"
 			>
 				<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -36,7 +38,8 @@ export function ActionButtons({ onSearch, onDetails, onShare }: ActionButtonsPro
 			</button>
 			<button
 				onClick={onShare}
-				className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 active:scale-95"
+				disabled
+				className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 opacity-50 cursor-not-allowed"
 			>
 				<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
