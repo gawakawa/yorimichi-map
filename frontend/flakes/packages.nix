@@ -48,7 +48,6 @@
               services.nginx = {
                 enable = true;
                 enableReload = true;
-                prependConfig = "user root;";
                 appendHttpConfig = ''
                   access_log /dev/stdout combined;
                 '';

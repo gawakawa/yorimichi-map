@@ -62,7 +62,8 @@ resource "google_cloud_run_v2_service" "frontend" {
         }
         initial_delay_seconds = 0
         period_seconds        = 10
-        failure_threshold     = 3
+        timeout_seconds       = 5
+        failure_threshold     = 6
       }
     }
 
