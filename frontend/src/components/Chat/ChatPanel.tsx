@@ -73,25 +73,74 @@ export function ChatPanel() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<div className="border-b border-gray-200 bg-white p-4">
-				<h2 className="m-0 text-xl font-semibold">寄り道マップ</h2>
+			{/* ヘッダー */}
+			<div className="border-b border-gray-200 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 px-6 py-5 shadow-sm">
+				<div className="flex items-center gap-3">
+					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+						<svg
+							className="h-6 w-6 text-white"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+							/>
+						</svg>
+					</div>
+					<div>
+						<h1 className="m-0 text-xl font-bold text-white">寄り道マップ</h1>
+						<p className="m-0 text-xs text-white/80">AI ドライブコンシェルジュ</p>
+					</div>
+				</div>
 			</div>
-			<div className="flex-1 overflow-y-auto space-y-4 p-4">
+
+			{/* メッセージエリア */}
+			<div className="flex-1 overflow-y-auto bg-white">
 				{error && (
-					<div
-						className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-800"
-						role="alert"
-						aria-live="polite"
-					>
-						<p className="m-0 text-sm font-medium">エラー</p>
-						<p className="m-0 text-sm">{error}</p>
+					<div className="mx-6 my-4">
+						<div
+							className="flex items-start gap-3 rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-4 shadow-sm"
+							role="alert"
+							aria-live="polite"
+						>
+							<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500">
+								<svg
+									className="h-5 w-5 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							</div>
+							<div className="flex-1">
+								<p className="m-0 mb-1 text-sm font-semibold text-red-900">エラーが発生しました</p>
+								<p className="m-0 text-sm text-red-800">{error}</p>
+							</div>
+						</div>
 					</div>
 				)}
 				<MessageList messages={messages} />
 				{messages.length === 0 && <SpotsList spots={MOCK_SPOTS} onSelect={handleSpotSelect} />}
 				{isLoading && (
-					<div className="flex justify-center py-4" aria-live="polite" aria-label="読み込み中">
-						<div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500" />
+					<div className="flex flex-col items-center justify-center py-8" aria-live="polite" aria-label="読み込み中">
+						<div className="relative">
+							<div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-transparent bg-gradient-to-br from-blue-500 to-purple-600" />
+							<div className="absolute inset-0 flex items-center justify-center">
+								<div className="h-6 w-6 rounded-full bg-white" />
+							</div>
+						</div>
+						<p className="mt-4 text-sm font-medium text-gray-600">考え中...</p>
 					</div>
 				)}
 			</div>

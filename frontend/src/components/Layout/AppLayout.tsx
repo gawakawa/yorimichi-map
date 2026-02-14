@@ -7,11 +7,14 @@ interface AppLayoutProps {
 
 export function AppLayout({ chatPanel, mapPanel }: AppLayoutProps) {
 	return (
-		<div className="grid h-screen grid-cols-1 md:grid-cols-[1fr_1.2fr]">
-			<div className="flex flex-col border-b border-gray-200 bg-gray-50 md:border-r md:border-b-0">
+		<div className="grid h-screen grid-cols-1 overflow-hidden bg-gray-50 md:grid-cols-[1fr_1.2fr]">
+			{/* チャットパネル */}
+			<div className="flex flex-col border-b border-gray-200 bg-white shadow-sm md:border-r md:border-b-0">
 				{chatPanel}
 			</div>
-			<div className="flex flex-col">{mapPanel}</div>
+
+			{/* マップパネル */}
+			<div className="flex flex-col bg-gray-100">{mapPanel}</div>
 		</div>
 	);
 }
