@@ -1,4 +1,5 @@
 import { config } from '../config';
+import { APIError } from './errors';
 
 export interface ChatMessage {
 	role: 'user' | 'assistant';
@@ -66,7 +67,8 @@ export const chatNavigationAPI = {
 		});
 
 		if (!response.ok) {
-			throw new Error(`API error: ${response.status} ${response.statusText}`);
+			const body = await response.json().catch(() => ({}));
+			throw new APIError(response.status, response.statusText, body.detail);
 		}
 
 		return response.json();
@@ -84,7 +86,8 @@ export const chatNavigationAPI = {
 		});
 
 		if (!response.ok) {
-			throw new Error(`API error: ${response.status} ${response.statusText}`);
+			const body = await response.json().catch(() => ({}));
+			throw new APIError(response.status, response.statusText, body.detail);
 		}
 
 		return response.json();

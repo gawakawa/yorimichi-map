@@ -1,5 +1,7 @@
 import { useChat } from '../../hooks/useChat';
 import { chatNavigationAPI } from '../../api/navigation';
+import { APIError } from '../../api/errors';
+import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
@@ -47,10 +49,19 @@ export function ChatPanel() {
 
 			addMessage(response.reply, 'assistant');
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : '通信エラーが発生しました。';
 			console.error('Failed to send message:', error);
-			setErrorMessage(errorMessage);
-			addMessage('申し訳ありません。エラーが発生しました。もう一度試してください。', 'assistant');
+			if (error instanceof APIError) {
+				const userMessage = getErrorMessage(error.status);
+				setErrorMessage(userMessage);
+				// 429 (rate limit) does not add assistant message to encourage retry later
+				if (error.status !== 429) {
+					addMessage(userMessage, 'assistant');
+				}
+			} else {
+				const errorMessage = '通信エラーが発生しました。';
+				setErrorMessage(errorMessage);
+				addMessage(errorMessage, 'assistant');
+			}
 		} finally {
 			setLoading(false);
 		}
