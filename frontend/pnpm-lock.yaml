@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@googlemaps/polyline-codec':
+        specifier: ^1.0.28
+        version: 1.0.28
       '@tanstack/react-query':
         specifier: ^5.90.20
         version: 5.90.20(react@19.2.4)
@@ -234,6 +237,9 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@googlemaps/polyline-codec@1.0.28':
+    resolution: {integrity: sha512-m7rh8sbxlrHvebXEweBHX8r1uPtToPRYxWDD6p6k2YG8hyhBe0Wi6xRUVFpxpEseMNgF+OBotFQC5senj8K7TQ==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1439,6 +1445,8 @@ snapshots:
     optional: true
 
   '@exodus/bytes@1.14.1': {}
+
+  '@googlemaps/polyline-codec@1.0.28': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
