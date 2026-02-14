@@ -29,10 +29,12 @@ const MOCK_SPOTS = [
 ];
 
 export function ChatPanel() {
-	const { messages, addMessage } = useChat();
+	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
 
 	const handleSend = async (message: string) => {
 		addMessage(message, 'user');
+		setErrorMessage(null);
+		setLoading(true);
 
 		try {
 			// Convert messages to API format (text -> content)
@@ -45,8 +47,12 @@ export function ChatPanel() {
 
 			addMessage(response.reply, 'assistant');
 		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : '通信エラーが発生しました。';
 			console.error('Failed to send message:', error);
-			addMessage('エラーが発生しました。もう一度試してください。', 'assistant');
+			setErrorMessage(errorMessage);
+			addMessage('申し訳ありません。エラーが発生しました。もう一度試してください。', 'assistant');
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -60,10 +66,25 @@ export function ChatPanel() {
 				<h2 className="m-0 text-xl font-semibold">寄り道マップ</h2>
 			</div>
 			<div className="flex-1 overflow-y-auto space-y-4 p-4">
+				{error && (
+					<div
+						className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-800"
+						role="alert"
+						aria-live="polite"
+					>
+						<p className="m-0 text-sm font-medium">エラー</p>
+						<p className="m-0 text-sm">{error}</p>
+					</div>
+				)}
 				<MessageList messages={messages} />
 				{messages.length === 0 && <SpotsList spots={MOCK_SPOTS} onSelect={handleSpotSelect} />}
+				{isLoading && (
+					<div className="flex justify-center py-4" aria-live="polite" aria-label="読み込み中">
+						<div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500" />
+					</div>
+				)}
 			</div>
-			<ChatInput onSend={handleSend} />
+			<ChatInput onSend={handleSend} isLoading={isLoading} />
 		</div>
 	);
 }

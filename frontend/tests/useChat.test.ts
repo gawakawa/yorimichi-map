@@ -88,4 +88,43 @@ describe('useChat', () => {
 
 		expect(result.current.messages).toHaveLength(firstLength + 1);
 	});
+
+	it('should initialize with isLoading false and error null', () => {
+		const { result } = renderHook(() => useChat());
+
+		expect(result.current.isLoading).toBe(false);
+		expect(result.current.error).toBeNull();
+	});
+
+	it('should set and clear loading state', () => {
+		const { result } = renderHook(() => useChat());
+
+		act(() => {
+			result.current.setLoading(true);
+		});
+
+		expect(result.current.isLoading).toBe(true);
+
+		act(() => {
+			result.current.setLoading(false);
+		});
+
+		expect(result.current.isLoading).toBe(false);
+	});
+
+	it('should set and clear error message', () => {
+		const { result } = renderHook(() => useChat());
+
+		act(() => {
+			result.current.setErrorMessage('API error');
+		});
+
+		expect(result.current.error).toBe('API error');
+
+		act(() => {
+			result.current.setErrorMessage(null);
+		});
+
+		expect(result.current.error).toBeNull();
+	});
 });

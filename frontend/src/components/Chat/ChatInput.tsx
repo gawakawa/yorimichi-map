@@ -2,13 +2,14 @@ import { useState, KeyboardEvent } from 'react';
 
 interface ChatInputProps {
 	onSend: (message: string) => void;
+	isLoading?: boolean;
 }
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
 	const [value, setValue] = useState('');
 
 	const trimmedValue = value.trim();
-	const canSend = trimmedValue.length > 0;
+	const canSend = trimmedValue.length > 0 && !isLoading;
 
 	const handleSend = () => {
 		if (canSend) {
