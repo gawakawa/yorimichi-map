@@ -52,13 +52,14 @@ export interface ReturnRouteResponse {
 }
 
 // Mock data for development/testing
+// Polyline encodes route: Tokyo Station → Odawara → Hakone Yumoto
 const MOCK_ROUTE: Route = {
 	origin: '東京駅',
 	destination: '箱根湯本駅',
 	waypoints: ['小田原城', '芦ノ湖'],
 	duration_seconds: '5400',
 	distance_meters: 95000,
-	encoded_polyline: 'wyueFhvspV~@mAhA}A|@uApAsArAxAlAxAlA|@uApAsArAxAlAlAxAxAxAxAxAxA',
+	encoded_polyline: 'g_wxEgiatYv~aA~j_AjjWnc_A',
 	google_maps_url: 'https://www.google.com/maps/dir/?api=1&origin=Tokyo+Station&destination=Hakone',
 };
 
