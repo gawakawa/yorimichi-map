@@ -15,7 +15,7 @@ resource "google_billing_budget" "monthly" {
   amount {
     specified_amount {
       currency_code = "JPY"
-      units         = "10000"
+      units         = "30000"
     }
   }
 
@@ -37,5 +37,10 @@ resource "google_billing_budget" "monthly" {
   threshold_rules {
     threshold_percent = 1.0
     spend_basis       = "FORECASTED_SPEND"
+  }
+
+  all_updates_rule {
+    pubsub_topic   = google_pubsub_topic.budget_alerts.id
+    schema_version = "1.0"
   }
 }

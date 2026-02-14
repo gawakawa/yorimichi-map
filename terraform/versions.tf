@@ -15,5 +15,9 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5.17"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.7"
+    }
   }
 }
