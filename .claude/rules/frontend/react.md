@@ -30,6 +30,7 @@ nix fmt -- --ci           # Check formatting (CI mode)
 - Formatter: oxfmt (tabs, single quotes)
 - Linter: oxlint with type-aware checks
 - TypeScript strict mode with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
+- Do not use `useMemo` or `useCallback` — React Compiler handles memoization automatically
 
 ## Containerization
 
