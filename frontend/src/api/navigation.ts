@@ -117,13 +117,13 @@ async function getMockResponse(message: string): Promise<ChatResponse> {
 	// Simulate API delay
 	await new Promise((resolve) => setTimeout(resolve, 800));
 
-	// Check if message contains location keywords
-	const hasRoute = /(?:駅|から|まで|行き|箱根|東京|小田原)/.test(message);
+	// Always return route for development/testing
+	console.log('[Mock API] Returning route for message:', message);
 
 	return {
 		reply: `了解しました。「${message}」というご要望ですね。\n\n推奨ルートを計算しました。以下のルートをご提案します：\n\n📍 出発地: 東京駅\n📍 目的地: 箱根湯本駅\n⏱️ 所要時間: 約1.5時間\n📏 距離: 約95km\n\n経由地として小田原城と芦ノ湖を提案します。ぜひご検討ください！`,
-		route: hasRoute ? MOCK_ROUTE : null,
-		places: hasRoute ? MOCK_PLACES : null,
+		route: MOCK_ROUTE,
+		places: MOCK_PLACES,
 	};
 }
 
