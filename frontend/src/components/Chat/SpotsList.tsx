@@ -1,8 +1,8 @@
-import type { MockSpot } from '../../mocks/spots';
+import type { Place } from '../../api/navigation';
 
 interface SpotsListProps {
-	spots: MockSpot[];
-	onSelect?: (spot: MockSpot) => void;
+	spots: Place[];
+	onSelect?: (spot: Place) => void;
 }
 
 export function SpotsList({ spots, onSelect }: SpotsListProps) {
@@ -50,7 +50,7 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 			</h3>
 			{spots.map((spot) => (
 				<button
-					key={spot.id}
+					key={spot.name}
 					onClick={() => onSelect?.(spot)}
 					className="group w-full rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
 				>
@@ -59,25 +59,21 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 							<h4 className="mb-1 font-semibold text-gray-800 group-hover:text-blue-600">
 								{spot.name}
 							</h4>
-							<p className="mb-2 text-sm text-gray-600">{spot.description}</p>
+							<p className="mb-2 text-sm text-gray-600">{spot.address}</p>
 							<div className="flex items-center gap-3 text-xs text-gray-500">
-								<span className="flex items-center gap-1">
-									<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-										/>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-										/>
-									</svg>
-									{spot.distance}km
-								</span>
+								{spot.price_level && (
+									<span className="flex items-center gap-1">
+										<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										{spot.price_level}
+									</span>
+								)}
 							</div>
 						</div>
 						<div className="ml-4 flex flex-col items-end">

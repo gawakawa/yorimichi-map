@@ -1,12 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useChat } from '../../hooks/useChat';
-import { chatNavigationAPI, type Route } from '../../api/navigation';
+import { chatNavigationAPI, type Route, type Place } from '../../api/navigation';
 import { APIError } from '../../api/errors';
 import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { SpotsList } from './SpotsList';
-import { MOCK_SPOTS } from '../../mocks/spots';
 
 interface ChatPanelProps {
 	onRouteReceived?: (route: Route | null) => void;
@@ -15,6 +14,7 @@ interface ChatPanelProps {
 export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const [spots, setSpots] = useState<Place[]>([]);
 
 	// メッセージが追加されたら自動的に最下部にスクロール
 	useEffect(() => {
@@ -36,6 +36,11 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 			const response = await chatNavigationAPI.sendMessage(message, history);
 
 			addMessage(response.reply, 'assistant');
+
+			// Update spots if received from API
+			if (response.places && response.places.length > 0) {
+				setSpots(response.places);
+			}
 
 			// Notify parent if route is received
 			if (response.route && onRouteReceived) {
@@ -128,7 +133,7 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 					)}
 
 					{messages.length === 0 ? (
-						<SpotsList spots={MOCK_SPOTS} onSelect={handleSpotSelect} />
+						<SpotsList spots={spots} onSelect={handleSpotSelect} />
 					) : (
 						<MessageList messages={messages} />
 					)}
