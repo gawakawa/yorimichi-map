@@ -27,7 +27,7 @@ Remote state stored in GCS bucket `yorimichi-map-tfstate` with prefix `terraform
 
 ### Infrastructure Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │ GitHub Actions                                                  │
 │   └── Workload Identity Federation (OIDC)                       │
@@ -71,7 +71,7 @@ Remote state stored in GCS bucket `yorimichi-map-tfstate` with prefix `terraform
 ### File Organization
 
 | File | Purpose |
-|------|---------|
+| ---- | ------- |
 | `cloud-run.tf` | Cloud Run services and runtime service account |
 | `workload-identity.tf` | GitHub Actions OIDC federation |
 | `artifact-registry.tf` | Container image registry |

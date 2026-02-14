@@ -31,7 +31,7 @@ API docs available at `/api/docs/` (Swagger UI) when dev server is running.
 
 ### Request Flow
 
-```
+```text
 Frontend → views.py → gemini.py (Automatic Function Calling)
                           ↓
               google_maps.py (search_places / calculate_route)
@@ -49,9 +49,12 @@ Frontend → views.py → gemini.py (Automatic Function Calling)
 
 ### Key Concepts
 
-**Automatic Function Calling**: Gemini decides when to call `search_places` or `calculate_route` based on user messages. The SDK automatically executes the Python functions and returns results to Gemini for summarization.
+**Automatic Function Calling**: Gemini decides when to call `search_places` or `calculate_route`
+based on user messages. The SDK automatically executes the Python functions and returns results
+to Gemini for summarization.
 
 **Authentication**:
+
 - Google Maps APIs: API key via `MAPS_API_KEY` environment variable
 - Vertex AI: Application Default Credentials (`gcloud auth application-default login`)
 

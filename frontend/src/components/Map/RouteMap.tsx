@@ -13,7 +13,7 @@ function MapUpdater({ routePoints }: { routePoints: [number, number][] }) {
 	useEffect(() => {
 		if (routePoints.length > 0) {
 			const bounds: LatLngBoundsExpression = routePoints.map(
-				(p) => [p[0], p[1]] as [number, number]
+				(p) => [p[0], p[1]] as [number, number],
 			);
 			map.fitBounds(bounds, { padding: [50, 50] });
 		}
