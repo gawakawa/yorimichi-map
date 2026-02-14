@@ -82,22 +82,18 @@
 
         container = nix2container.buildImage {
           name = "yorimichi-map-frontend";
-          copyToRoot = pkgs.buildEnv {
-            name = "root";
-            paths = [
-              frontend
-              pkgs.nginx
-              (pkgs.runCommand "container-init" { } ''
-                mkdir -p $out/var/log/nginx $out/var/cache/nginx $out/tmp $out/run/nginx
-                mkdir -p $out/etc
-                echo "root:x:0:0:root:/root:/bin/sh" > $out/etc/passwd
-                echo "nobody:x:65534:65534:nobody:/nonexistent:/bin/sh" >> $out/etc/passwd
-                echo "root:x:0:" > $out/etc/group
-                echo "nogroup:x:65534:" >> $out/etc/group
-              '')
-            ];
-            pathsToLink = [ "/" ];
-          };
+          copyToRoot = [
+            frontend
+            pkgs.nginx
+            (pkgs.runCommand "container-init" { } ''
+              mkdir -p $out/var/log/nginx $out/var/cache/nginx $out/tmp $out/run/nginx
+              mkdir -p $out/etc
+              echo "root:x:0:0:root:/root:/bin/sh" > $out/etc/passwd
+              echo "nobody:x:65534:65534:nobody:/nonexistent:/bin/sh" >> $out/etc/passwd
+              echo "root:x:0:" > $out/etc/group
+              echo "nogroup:x:65534:" >> $out/etc/group
+            '')
+          ];
           config = {
             Cmd = [
               "${pkgs.nginx}/bin/nginx"
