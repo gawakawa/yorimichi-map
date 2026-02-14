@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
@@ -52,7 +52,11 @@ def _attach_deep_link(route_data: dict[str, Any]) -> dict[str, Any]:
     summary="AIチャット",
     description="AIドライブコンシェルジュとの対話。Function Callingでルート・スポット検索を自動実行。",
     request=ChatRequestSerializer,
-    responses={200: ChatResponseSerializer},
+    responses={
+        200: ChatResponseSerializer,
+        429: OpenApiResponse(description="Too Many Requests"),
+        503: OpenApiResponse(description="Service Unavailable"),
+    },
 )
 @api_view(["POST"])
 def chat(request: Request) -> Response:
@@ -100,7 +104,12 @@ def chat(request: Request) -> Response:
     summary="帰路ルート生成",
     description="経由地を逆順にした帰りのルートを計算。",
     request=ReturnRouteRequestSerializer,
-    responses={200: ReturnRouteResponseSerializer},
+    responses={
+        200: ReturnRouteResponseSerializer,
+        400: OpenApiResponse(description="Bad Request"),
+        429: OpenApiResponse(description="Too Many Requests"),
+        502: OpenApiResponse(description="Bad Gateway"),
+    },
 )
 @api_view(["POST"])
 def return_route(request: Request) -> Response:
