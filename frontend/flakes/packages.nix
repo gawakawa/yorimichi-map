@@ -88,15 +88,9 @@
             paths = [
               frontend
               pkgs.nginx
+              pkgs.dockerTools.fakeNss # /etc/passwd, /etc/group, /etc/nsswitch.conf を提供
               (pkgs.runCommand "container-init" { } ''
-                mkdir -p $out/var/log/nginx $out/var/cache/nginx $out/tmp $out/etc $out/run/nginx
-                echo "root:x:0:0:root:/root:/bin/sh" > $out/etc/passwd
-                echo "root:x:0:" > $out/etc/group
-                cat > $out/etc/nsswitch.conf << 'EOF'
-                passwd: files
-                group: files
-                hosts: files dns
-                EOF
+                mkdir -p $out/var/log/nginx $out/var/cache/nginx $out/tmp $out/run/nginx
               '')
             ];
             pathsToLink = [ "/" ];
