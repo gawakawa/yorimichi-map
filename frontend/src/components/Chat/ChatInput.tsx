@@ -39,11 +39,7 @@ export function ChatInput({ onSend, isLoading = false, disabled = false }: ChatI
 						value={value}
 						onChange={(e) => setValue(e.target.value)}
 						onKeyDown={handleKeyDown}
-						placeholder={
-							disabled
-								? '出発地と目的地を入力してください'
-								: 'どこへ行きたいですか？寄り道したい場所はありますか？'
-						}
+						placeholder={disabled ? '出発地と目的地を入力してください' : '寄り道したい場所は？'}
 						rows={1}
 						disabled={disabled}
 						className="max-h-32 flex-1 resize-none bg-transparent px-3 py-3 font-sans text-base leading-relaxed text-gray-800 placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
