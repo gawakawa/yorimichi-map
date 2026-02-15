@@ -129,7 +129,9 @@ class WaypointSuggestRequestSerializer(serializers.Serializer):
 
     origin = serializers.CharField(help_text="出発地")
     destination = serializers.CharField(help_text="目的地")
-    prompt = serializers.CharField(help_text="寄り道リクエスト（例: 途中で温泉に寄りたい）")
+    prompt = serializers.CharField(
+        help_text="寄り道リクエスト（例: 途中で温泉に寄りたい）"
+    )
 
 
 class WaypointSuggestResponseSerializer(serializers.Serializer):
