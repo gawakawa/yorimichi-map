@@ -194,30 +194,30 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 							onDestinationChange={setDestination}
 							onSearch={handleRouteSearch}
 							isSearching={isSearchingRoute}
-						/>
+						>
+							{/* Confirmed waypoints display */}
+							{confirmedWaypoints.length > 0 && (
+								<div className="mb-2">
+									<ConfirmedWaypointsList
+										waypoints={confirmedWaypoints}
+										onRemove={removeConfirmedWaypoint}
+									/>
+								</div>
+							)}
+
+							{/* Waypoint candidates display */}
+							{waypointCandidates.length > 0 && (
+								<div className="mb-2">
+									<WaypointCandidatesList
+										candidates={waypointCandidates}
+										selectedCandidates={selectedCandidates}
+										onSelect={toggleSelection}
+										onConfirm={handleConfirmWaypoints}
+									/>
+								</div>
+							)}
+						</RouteInputForm>
 					</div>
-
-					{/* Confirmed waypoints display */}
-					{confirmedWaypoints.length > 0 && (
-						<div className="mb-4">
-							<ConfirmedWaypointsList
-								waypoints={confirmedWaypoints}
-								onRemove={removeConfirmedWaypoint}
-							/>
-						</div>
-					)}
-
-					{/* Waypoint candidates display */}
-					{waypointCandidates.length > 0 && (
-						<div className="mb-4">
-							<WaypointCandidatesList
-								candidates={waypointCandidates}
-								selectedCandidates={selectedCandidates}
-								onSelect={toggleSelection}
-								onConfirm={handleConfirmWaypoints}
-							/>
-						</div>
-					)}
 
 					{/* Route searching indicator */}
 					{isSearchingRoute && (
