@@ -12,18 +12,6 @@
         inherit system;
       }) {
         programs.terraform.enable = true;
-        settings.servers = {
-          drawio-diagrams = {
-            command = "${pkgs.lib.getExe' pkgs.nodejs_20 "npx"}";
-            args = [
-              "-y"
-              "drawio-mcp"
-            ];
-            env = {
-              PATH = "${pkgs.nodejs_20}/bin:/usr/bin:/bin";
-            };
-          };
-        };
       };
 
       devPackages =
