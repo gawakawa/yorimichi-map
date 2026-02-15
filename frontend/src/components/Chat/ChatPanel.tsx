@@ -143,7 +143,7 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
           </div>
           <div>
             <h1 className="m-0 text-xl font-bold text-white">寄り道マップ</h1>
-            <p className="m-0 text-xs text-white/80">AI ドライブコンシェルジュ</p>
+            <p className="m-0 text-xs text-white/80">AI ルートコンシェルジュ</p>
           </div>
         </div>
       </div>

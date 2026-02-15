@@ -46,7 +46,7 @@ export function MessageBubble({ text, role }: MessageBubbleProps) {
         {/* メッセージ内容 */}
         <div className="flex-1 space-y-2 pt-1">
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            AI ドライブコンシェルジュ
+            AI ルートコンシェルジュ
           </div>
           <div className="prose prose-sm max-w-none text-gray-800">
             <p className="whitespace-pre-wrap leading-relaxed">{text}</p>
