@@ -23,3 +23,7 @@
 - [frontend/](./frontend/) - フロントエンド (React)
 - [backend/](./backend/) - バックエンド (Django)
 - [terraform/](./terraform/) - インフラ (Terraform)
+
+## ライセンス
+
+[MIT](./LICENSE)
