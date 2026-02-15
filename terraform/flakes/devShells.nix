@@ -30,6 +30,8 @@
         config.pre-commit.settings.enabledPackages
         ++ (with pkgs; [
           opentofu
+          graphviz # diagrams dependency
+          (python3.withPackages (ps: [ ps.diagrams ]))
         ]);
     in
     {
