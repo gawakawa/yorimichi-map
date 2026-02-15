@@ -1,5 +1,4 @@
 import { formatDistance, formatDuration } from '../../utils/format';
-import { ActionButtons } from './ActionButtons';
 
 interface RouteSummaryProps {
 	origin?: string;
@@ -9,9 +8,6 @@ interface RouteSummaryProps {
 	waypoints?: string[];
 	googleMapsUrl?: string;
 	title?: string;
-	onSearch?: () => void;
-	onDetails?: () => void;
-	onShare?: () => void;
 }
 
 export function RouteSummary({
@@ -22,15 +18,6 @@ export function RouteSummary({
 	waypoints = [],
 	googleMapsUrl,
 	title = 'おすすめルート',
-	onSearch = () => {
-		// TODO: 検索処理を実装
-	},
-	onDetails = () => {
-		// TODO: 詳細表示処理を実装
-	},
-	onShare = () => {
-		// TODO: 共有処理を実装
-	},
 }: RouteSummaryProps) {
 	return (
 		<div className="space-y-4 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 p-5 shadow-sm">
@@ -143,8 +130,6 @@ export function RouteSummary({
 					)}
 				</div>
 			</div>
-
-			<ActionButtons onSearch={onSearch} onDetails={onDetails} onShare={onShare} />
 		</div>
 	);
 }
