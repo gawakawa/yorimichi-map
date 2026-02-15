@@ -3,9 +3,11 @@ import type { Place } from '../../api/navigation';
 interface SpotsListProps {
 	spots: Place[];
 	onSelect?: (spot: Place) => void;
+	selectedSpots?: Place[];
 }
 
-export function SpotsList({ spots, onSelect }: SpotsListProps) {
+export function SpotsList({ spots, onSelect, selectedSpots = [] }: SpotsListProps) {
+	const isSelected = (spot: Place) => selectedSpots.some((s) => s.name === spot.name);
 	if (spots.length === 0) {
 		return (
 			<div className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-12">
@@ -46,13 +48,17 @@ export function SpotsList({ spots, onSelect }: SpotsListProps) {
 	return (
 		<div className="space-y-3 px-6 py-4">
 			<h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-				おすすめスポット
+				おすすめスポット（タップして経由地に追加）
 			</h3>
 			{spots.map((spot, index) => (
 				<button
 					key={`${spot.name}-${spot.address}-${index}`}
 					onClick={() => onSelect?.(spot)}
-					className="group w-full rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
+					className={`group w-full rounded-xl border p-4 text-left shadow-sm transition-all hover:shadow-md ${
+						isSelected(spot)
+							? 'border-blue-500 bg-blue-50 ring-2 ring-blue-500'
+							: 'border-gray-200 bg-white hover:border-blue-300'
+					}`}
 				>
 					<div className="flex items-start justify-between">
 						<div className="flex-1">
