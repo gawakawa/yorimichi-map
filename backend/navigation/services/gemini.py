@@ -20,9 +20,11 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from typing import Any
 
 import vertexai
+from google.api_core.exceptions import ResourceExhausted
 from django.conf import settings
 from vertexai.generative_models import (
     Content,
@@ -245,12 +247,46 @@ def send_message(
 
     # メッセージを送信。Gemini がツール呼び出しを必要と判断した場合、
     # afc_responder により自動的に search_places / calculate_route が実行される。
-    try:
-        response = chat.send_message(message)
-    except (ValueError, GeminiFunctionCallingError, RuntimeError):
-        logger.exception("Gemini send_message failed (possible function calling loop)")
+    # Vertex AI のレート制限（429 ResourceExhausted）に対応するため、
+    # 指数バックオフ付きリトライを実装。
+    max_retries = 3
+    response = None
+    for attempt in range(max_retries):
+        try:
+            response = chat.send_message(message)
+            break
+        except ResourceExhausted:
+            if attempt == max_retries - 1:
+                logger.exception(
+                    "Gemini rate limit exceeded after %d retries", max_retries
+                )
+                return (
+                    "申し訳ありません。サーバーが混み合っています。しばらく待ってから再度お試しください。",
+                    None,
+                    None,
+                )
+            wait_time = 2**attempt  # 1, 2, 4 seconds
+            logger.warning(
+                "Rate limited, retrying in %ds (attempt %d/%d)",
+                wait_time,
+                attempt + 1,
+                max_retries,
+            )
+            time.sleep(wait_time)
+        except (ValueError, GeminiFunctionCallingError, RuntimeError):
+            logger.exception(
+                "Gemini send_message failed (possible function calling loop)"
+            )
+            return (
+                "申し訳ありません。処理中にエラーが発生しました。内容を変えて再度お試しください。",
+                None,
+                None,
+            )
+
+    if response is None:
+        # Should not reach here, but handle defensively
         return (
-            "申し訳ありません。処理中にエラーが発生しました。内容を変えて再度お試しください。",
+            "申し訳ありません。予期しないエラーが発生しました。",
             None,
             None,
         )
