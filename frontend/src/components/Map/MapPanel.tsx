@@ -13,6 +13,7 @@ export function MapPanel({ route }: MapPanelProps) {
 				<RouteSummary
 					distance={route?.distance_meters}
 					duration={route?.duration_seconds ? parseInt(route.duration_seconds, 10) : undefined}
+					waypoints={route?.waypoints}
 				/>
 			</div>
 			<div className="relative flex-1 overflow-hidden">

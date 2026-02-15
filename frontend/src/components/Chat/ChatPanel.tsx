@@ -219,12 +219,6 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 										<span className="font-medium">所要時間:</span>{' '}
 										{Math.round(parseInt(route.duration_seconds) / 60)} 分
 									</p>
-									{route.tolls && route.tolls.length > 0 && (
-										<p>
-											<span className="font-medium">料金:</span>{' '}
-											{route.tolls.map((t) => `${t.units}${t.currencyCode}`).join(', ')}
-										</p>
-									)}
 								</div>
 								<div className="mt-4 flex gap-2">
 									<a
