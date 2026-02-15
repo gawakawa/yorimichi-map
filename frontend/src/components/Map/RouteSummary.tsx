@@ -51,7 +51,17 @@ export function RouteSummary({
 							/>
 						</svg>
 					</div>
-					<h3 className="text-lg font-bold text-gray-800">{title}</h3>
+					<h3 className="flex-1 text-lg font-bold text-gray-800">{title}</h3>
+					{googleMapsUrl && (
+						<a
+							href={googleMapsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="rounded-lg bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200"
+						>
+							Google Maps で開く
+						</a>
+					)}
 				</div>
 
 				{(origin || destination) && (
@@ -133,17 +143,6 @@ export function RouteSummary({
 					)}
 				</div>
 			</div>
-
-			{googleMapsUrl && (
-				<a
-					href={googleMapsUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="block w-full rounded-lg bg-blue-500 px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-blue-600"
-				>
-					Google Maps で開く
-				</a>
-			)}
 
 			<ActionButtons onSearch={onSearch} onDetails={onDetails} onShare={onShare} />
 		</div>
