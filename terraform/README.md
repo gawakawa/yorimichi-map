@@ -2,7 +2,11 @@
 
 ## Overview
 
-This module provides...
+This module provisions the Google Cloud infrastructure for Yorimichi Map.
+
+## Architecture
+
+![Architecture](./architecture.drawio.svg)
 
 <!-- markdownlint-disable MD033 MD060 -->
 <!-- BEGIN_TF_DOCS -->
