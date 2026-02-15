@@ -24,15 +24,14 @@ with Diagram(
             ar = ContainerRegistry("Artifact Registry")
 
         with Cluster("Cloud Run"):
-            frontend = Run("Frontend")
-            backend = Run("Backend")
+            frontend = Run("Cloud Run\nFrontend")
+            backend = Run("Cloud Run\nBackend")
 
         secrets = KMS("Secret Manager")
         vertex = AIPlatform("Vertex AI")
 
     # User flow
     user >> cloudflare >> frontend
-    cloudflare >> backend
     frontend >> Edge(label="API") >> backend
 
     # Backend services
@@ -42,4 +41,3 @@ with Diagram(
     # CI/CD flow
     github >> Edge(label="OIDC") >> wif >> ar
     ar >> Edge(style="dashed", label="deploy") >> frontend
-    ar >> Edge(style="dashed", label="deploy") >> backend
