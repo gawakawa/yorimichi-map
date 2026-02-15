@@ -8,11 +8,14 @@
       ...
     }:
     let
-      mcpConfig = inputs.mcp-servers-nix.lib.mkConfig (import inputs.mcp-servers-nix.inputs.nixpkgs {
-        inherit system;
-      }) {
-        programs.terraform.enable = true;
-      };
+      mcpConfig =
+        inputs.mcp-servers-nix.lib.mkConfig
+          (import inputs.mcp-servers-nix.inputs.nixpkgs {
+            inherit system;
+          })
+          {
+            programs.terraform.enable = true;
+          };
 
       devPackages =
         config.pre-commit.settings.enabledPackages
