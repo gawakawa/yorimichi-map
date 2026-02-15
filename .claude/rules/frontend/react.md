@@ -23,11 +23,11 @@ nix fmt -- --ci           # Check formatting (CI mode)
 - React 19 with React Compiler (via babel-plugin-react-compiler)
 - Vite bundler (using rolldown-vite)
 - TanStack Query for data fetching
-- Formatter: oxfmt (tabs, single quotes)
+- Formatter: oxfmt (spaces, single quotes)
 
 ## Code Style
 
-- Formatter: oxfmt (tabs, single quotes)
+- Formatter: oxfmt (spaces, single quotes)
 - Linter: oxlint with type-aware checks
 - TypeScript strict mode with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
 - Do not use `useMemo` or `useCallback` — React Compiler handles memoization automatically
