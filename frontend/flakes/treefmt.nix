@@ -4,7 +4,7 @@ _: {
     let
       oxfmtConfig = pkgs.writeText "oxfmtrc.json" (
         builtins.toJSON {
-          useTabs = true;
+          useTabs = false;
           singleQuote = true;
         }
       );

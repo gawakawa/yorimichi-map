@@ -9,20 +9,12 @@ vi.mock('react-leaflet', () => ({
 		<div data-testid="map-container">{children}</div>
 	),
 	TileLayer: () => <div data-testid="tile-layer" />,
-	Marker: ({
-		children,
-		position,
-	}: {
-		children: React.ReactNode;
-		position: [number, number];
-	}) => (
+	Marker: ({ children, position }: { children: React.ReactNode; position: [number, number] }) => (
 		<div data-testid="marker" data-position={position.join(',')}>
 			{children}
 		</div>
 	),
-	Popup: ({ children }: { children: React.ReactNode }) => (
-		<div data-testid="popup">{children}</div>
-	),
+	Popup: ({ children }: { children: React.ReactNode }) => <div data-testid="popup">{children}</div>,
 	Polyline: () => <div data-testid="polyline" />,
 	useMap: () => ({
 		fitBounds: vi.fn(),

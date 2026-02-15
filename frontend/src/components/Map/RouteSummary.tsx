@@ -51,22 +51,30 @@ export function RouteSummary({
 					)}
 				</div>
 
-				{(origin || destination) && (
-					<div className="mb-3 space-y-1 text-sm text-gray-700">
-						{origin && (
-							<p>
-								<span className="font-medium">出発:</span> {origin}
-							</p>
-						)}
-						{destination && (
-							<p>
-								<span className="font-medium">到着:</span> {destination}
-							</p>
-						)}
-					</div>
-				)}
-
 				<div className="space-y-3">
+					{origin && (
+						<div className="flex items-center justify-between rounded-lg bg-white/60 px-4 py-3">
+							<div className="flex items-center gap-2 text-gray-600">
+								<div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+									<span className="text-xs font-bold text-white">S</span>
+								</div>
+								<span className="text-sm font-medium">出発地</span>
+							</div>
+							<span className="font-semibold text-gray-800">{origin}</span>
+						</div>
+					)}
+
+					{destination && (
+						<div className="flex items-center justify-between rounded-lg bg-white/60 px-4 py-3">
+							<div className="flex items-center gap-2 text-gray-600">
+								<div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500">
+									<span className="text-xs font-bold text-white">G</span>
+								</div>
+								<span className="text-sm font-medium">目的地</span>
+							</div>
+							<span className="font-semibold text-gray-800">{destination}</span>
+						</div>
+					)}
 					<div className="flex items-center justify-between rounded-lg bg-white/60 px-4 py-3">
 						<div className="flex items-center gap-2 text-gray-600">
 							<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
