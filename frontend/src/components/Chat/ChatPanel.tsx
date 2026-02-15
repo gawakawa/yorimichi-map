@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useChat } from '../../hooks/useChat';
-import { chatNavigationAPI, type Route, type Place } from '../../api/navigation';
+import { chatNavigationAPI, type Route, type WaypointCandidate } from '../../api/navigation';
 import { APIError } from '../../api/errors';
 import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
-import { SpotsList } from './SpotsList';
+import { WaypointCandidatesList } from './WaypointCandidatesList';
 import { RouteInputForm } from './RouteInputForm';
 
 interface ChatPanelProps {
@@ -15,14 +15,16 @@ interface ChatPanelProps {
 export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 	const { messages, addMessage, isLoading, setLoading, error, setErrorMessage } = useChat();
 	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const [spots, setSpots] = useState<Place[]>([]);
 
 	// Route search state
 	const [origin, setOrigin] = useState('');
 	const [destination, setDestination] = useState('');
-	const [selectedWaypoints, setSelectedWaypoints] = useState<Place[]>([]);
 	const [isSearchingRoute, setIsSearchingRoute] = useState(false);
 	const [route, setRoute] = useState<Route | null>(null);
+
+	// Waypoint candidates state
+	const [waypointCandidates, setWaypointCandidates] = useState<WaypointCandidate[]>([]);
+	const [selectedCandidates, setSelectedCandidates] = useState<WaypointCandidate[]>([]);
 
 	// Notify parent when route is received
 	useEffect(() => {
@@ -40,33 +42,28 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		addMessage(message, 'user');
 		setErrorMessage(null);
 		setLoading(true);
+		setWaypointCandidates([]);
+		setSelectedCandidates([]);
 
 		try {
-			// Convert messages to API format (text -> content)
-			const history = messages.map((m) => ({
-				role: m.role,
-				content: m.text,
-			}));
+			const response = await chatNavigationAPI.suggestWaypoints({
+				origin: origin.trim(),
+				destination: destination.trim(),
+				prompt: message,
+			});
 
-			const response = await chatNavigationAPI.sendMessage(message, history);
-
-			addMessage(response.reply, 'assistant');
-
-			// Update spots if received from API
-			if (response.places && response.places.length > 0) {
-				setSpots(response.places);
+			if (response.ai_comment) {
+				addMessage(response.ai_comment, 'assistant');
 			}
 
-			// Notify parent if route is received
-			if (response.route && onRouteReceived) {
-				onRouteReceived(response.route);
+			if (response.candidates && response.candidates.length > 0) {
+				setWaypointCandidates(response.candidates);
 			}
 		} catch (err) {
-			console.error('Failed to send message:', err);
+			console.error('Failed to suggest waypoints:', err);
 			if (err instanceof APIError) {
 				const userMessage = getErrorMessage(err.status);
 				setErrorMessage(userMessage);
-				// 429 (rate limit) does not add assistant message to encourage retry later
 				if (err.status !== 429) {
 					addMessage(userMessage, 'assistant');
 				}
@@ -80,18 +77,18 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		}
 	};
 
-	// Handle spot selection as waypoint
-	const handleSpotSelect = (spot: Place) => {
-		setSelectedWaypoints((prev) => {
-			const exists = prev.some((w) => w.name === spot.name);
+	// Handle candidate selection
+	const handleCandidateSelect = (candidate: WaypointCandidate) => {
+		setSelectedCandidates((prev) => {
+			const exists = prev.some((c) => c.name === candidate.name);
 			if (exists) {
-				return prev.filter((w) => w.name !== spot.name);
+				return prev.filter((c) => c.name !== candidate.name);
 			}
-			return [...prev, spot];
+			return [...prev, candidate];
 		});
 	};
 
-	// Calculate route with selected waypoints
+	// Calculate route with selected candidates
 	const handleRouteSearch = async () => {
 		if (origin.trim() === '' || destination.trim() === '') {
 			setErrorMessage('出発地と目的地を入力してください');
@@ -102,13 +99,15 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		setErrorMessage(null);
 
 		try {
-			const waypoints = selectedWaypoints.map((w) => w.name);
+			const waypoints = selectedCandidates.map((c) => c.name);
 			const response = await chatNavigationAPI.calculateRoute({
 				origin: origin.trim(),
 				destination: destination.trim(),
 				waypoints,
 			});
 			setRoute(response.route);
+			setWaypointCandidates([]);
+			setSelectedCandidates([]);
 		} catch (err) {
 			console.error('Route calculation failed:', err);
 			if (err instanceof APIError) {
@@ -124,7 +123,8 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 	// Reset route search
 	const handleReset = () => {
 		setRoute(null);
-		setSelectedWaypoints([]);
+		setWaypointCandidates([]);
+		setSelectedCandidates([]);
 		if (onRouteReceived) {
 			onRouteReceived(null);
 		}
@@ -255,40 +255,16 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 						</div>
 					)}
 
-					{/* Selected waypoints display */}
-					{!route && selectedWaypoints.length > 0 && (
-						<div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-							<h3 className="mb-2 text-sm font-semibold text-blue-800">
-								選択した経由地 ({selectedWaypoints.length}件)
-							</h3>
-							<div className="flex flex-wrap gap-2">
-								{selectedWaypoints.map((wp) => (
-									<button
-										key={wp.name}
-										type="button"
-										onClick={() => handleSpotSelect(wp)}
-										className="flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 hover:bg-blue-200"
-									>
-										{wp.name}
-										<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M6 18L18 6M6 6l12 12"
-											/>
-										</svg>
-									</button>
-								))}
-							</div>
-							<button
-								type="button"
-								onClick={handleRouteSearch}
-								disabled={isSearchingRoute || origin.trim() === '' || destination.trim() === ''}
-								className="mt-3 w-full rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-							>
-								{isSearchingRoute ? 'ルート検索中...' : 'このルートで検索'}
-							</button>
+					{/* Waypoint candidates display */}
+					{!route && waypointCandidates.length > 0 && (
+						<div className="mb-4">
+							<WaypointCandidatesList
+								candidates={waypointCandidates}
+								selectedCandidates={selectedCandidates}
+								onSelect={handleCandidateSelect}
+								onConfirm={handleRouteSearch}
+								isSearching={isSearchingRoute}
+							/>
 						</div>
 					)}
 
@@ -309,25 +285,10 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 						</div>
 					)}
 
-					{/* Chat messages and spots */}
+					{/* Chat messages */}
 					{!route && (
 						<>
-							{messages.length === 0 && spots.length === 0 ? (
-								<SpotsList spots={[]} onSelect={handleSpotSelect} />
-							) : (
-								<>
-									<MessageList messages={messages} />
-									{spots.length > 0 && (
-										<div className="mt-4">
-											<SpotsList
-												spots={spots}
-												onSelect={handleSpotSelect}
-												selectedSpots={selectedWaypoints}
-											/>
-										</div>
-									)}
-								</>
-							)}
+							<MessageList messages={messages} />
 
 							{isLoading && (
 								<div
@@ -355,7 +316,11 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 			{/* Chat input (visible when no route result) */}
 			{!route && (
 				<div className="flex-shrink-0">
-					<ChatInput onSend={handleSend} isLoading={isLoading} />
+					<ChatInput
+						onSend={handleSend}
+						isLoading={isLoading}
+						disabled={!origin.trim() || !destination.trim()}
+					/>
 				</div>
 			)}
 		</div>
