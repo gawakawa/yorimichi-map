@@ -35,6 +35,9 @@ export function RouteMap({ route }: RouteMapProps) {
 	const endPoint = hasRoute ? routePoints[routePoints.length - 1] : null;
 	const center = startPoint ?? DEFAULT_CENTER;
 
+	const waypointCoords = route?.waypoint_coords ?? [];
+	const waypointNames = route?.waypoints ?? [];
+
 	return (
 		<MapContainer
 			center={center}
@@ -53,6 +56,12 @@ export function RouteMap({ route }: RouteMapProps) {
 					<Popup>出発地点</Popup>
 				</Marker>
 			)}
+
+			{waypointCoords.map((coord, index) => (
+				<Marker key={`waypoint-${index}`} position={[coord.latitude, coord.longitude]}>
+					<Popup>{waypointNames[index] ?? `経由地${index + 1}`}</Popup>
+				</Marker>
+			))}
 
 			{endPoint && (
 				<Marker position={[endPoint[0], endPoint[1]]}>

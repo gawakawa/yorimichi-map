@@ -1,13 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { chatNavigationAPI, __setUseMockAPI } from '../src/api/navigation';
+import { chatNavigationAPI } from '../src/api/navigation';
 import { APIError } from '../src/api/errors';
 import { getErrorMessage } from '../src/utils/errorMessages';
 
 // Mock fetch
 global.fetch = vi.fn();
-
-// Disable mock API for tests to use real fetch
-__setUseMockAPI(false);
 
 describe('navigation API', () => {
 	beforeEach(() => {

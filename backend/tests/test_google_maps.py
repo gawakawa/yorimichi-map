@@ -284,3 +284,87 @@ class TestCalculateRoute:
         result = calculate_route("A", "B")
 
         assert result["tolls"] == []
+
+    @patch("navigation.services.google_maps.requests.post")
+    def test_success_with_waypoint_coords(self, mock_post: Mock) -> None:
+        """経由地の座標が legs から正しく抽出されること。"""
+        mock_response = Mock()
+        mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {
+            "routes": [
+                {
+                    "duration": "7200s",
+                    "distanceMeters": 100000,
+                    "polyline": {"encodedPolyline": "xyz789"},
+                    "legs": [
+                        {
+                            # leg[0]: origin → waypoint1
+                            "endLocation": {
+                                "latLng": {"latitude": 35.2474, "longitude": 139.1549}
+                            }
+                        },
+                        {
+                            # leg[1]: waypoint1 → waypoint2
+                            "endLocation": {
+                                "latLng": {"latitude": 35.2074, "longitude": 139.1028}
+                            }
+                        },
+                        {
+                            # leg[2]: waypoint2 → destination (not included in waypoint_coords)
+                            "endLocation": {
+                                "latLng": {"latitude": 35.2321, "longitude": 139.1067}
+                            }
+                        },
+                    ],
+                }
+            ]
+        }
+        mock_post.return_value = mock_response
+
+        settings.MAPS_API_KEY = "test-api-key"
+        result = calculate_route(
+            "東京駅", "箱根湯本駅", waypoints=["小田原城", "芦ノ湖"]
+        )
+
+        assert "error" not in result
+        assert "waypoint_coords" in result
+        assert len(result["waypoint_coords"]) == 2
+        assert result["waypoint_coords"][0] == {
+            "latitude": 35.2474,
+            "longitude": 139.1549,
+        }
+        assert result["waypoint_coords"][1] == {
+            "latitude": 35.2074,
+            "longitude": 139.1028,
+        }
+
+    @patch("navigation.services.google_maps.requests.post")
+    def test_no_waypoints_returns_empty_coords(self, mock_post: Mock) -> None:
+        """経由地なしの場合は空配列を返すこと。"""
+        mock_response = Mock()
+        mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {
+            "routes": [
+                {
+                    "duration": "3600s",
+                    "distanceMeters": 50000,
+                    "polyline": {"encodedPolyline": "abc123"},
+                    "legs": [
+                        {
+                            # leg[0]: origin → destination
+                            "endLocation": {
+                                "latLng": {"latitude": 35.4654, "longitude": 139.6224}
+                            }
+                        },
+                    ],
+                }
+            ]
+        }
+        mock_post.return_value = mock_response
+
+        settings.MAPS_API_KEY = "test-api-key"
+        result = calculate_route("東京駅", "横浜駅")
+
+        assert "error" not in result
+        assert "waypoint_coords" in result
+        assert result["waypoint_coords"] == []

@@ -64,11 +64,13 @@ class RouteSerializer(serializers.Serializer):
     encoded_polyline は Google Encoded Polyline 形式の文字列。
     フロントエンドでデコードして地図上にポリラインを描画する。
     google_maps_url は Google Maps アプリを開くためのディープリンク。
+    waypoint_coords は経由地の座標リスト（マップ上にマーカーを表示するため）。
     """
 
     origin = serializers.CharField()
     destination = serializers.CharField()
     waypoints = serializers.ListField(child=serializers.CharField())
+    waypoint_coords = CoordsSerializer(many=True, required=False, default=[])
     duration_seconds = serializers.CharField()
     distance_meters = serializers.IntegerField()
     encoded_polyline = serializers.CharField()

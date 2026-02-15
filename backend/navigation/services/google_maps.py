@@ -149,7 +149,8 @@ def calculate_route(
             "routes.duration,"
             "routes.distanceMeters,"
             "routes.travelAdvisory.tollInfo,"
-            "routes.polyline.encodedPolyline"
+            "routes.polyline.encodedPolyline,"
+            "routes.legs.endLocation"
         ),
     }
 
@@ -225,10 +226,26 @@ def calculate_route(
             }
         )
 
+    # 経由地の座標を抽出
+    # legs 構造: legs[0].endLocation = 1番目の経由地, ..., legs[N-1].endLocation = 目的地
+    # 経由地は legs[0] から legs[N-2] まで（最後の leg は目的地なので除外）
+    waypoint_coords: list[dict[str, float]] = []
+    legs = route.get("legs", [])
+    if waypoints and len(legs) > 1:
+        for leg in legs[:-1]:  # exclude last leg (destination)
+            end_location = leg.get("endLocation", {}).get("latLng", {})
+            waypoint_coords.append(
+                {
+                    "latitude": end_location.get("latitude", 0),
+                    "longitude": end_location.get("longitude", 0),
+                }
+            )
+
     return {
         "origin": origin,
         "destination": destination,
         "waypoints": waypoints or [],
+        "waypoint_coords": waypoint_coords,
         "duration_seconds": route.get("duration", "0s"),
         "distance_meters": route.get("distanceMeters", 0),
         "encoded_polyline": route.get("polyline", {}).get("encodedPolyline", ""),
