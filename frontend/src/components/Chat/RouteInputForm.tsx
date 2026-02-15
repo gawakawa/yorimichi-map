@@ -59,7 +59,7 @@ export function RouteInputForm({
 				type="button"
 				onClick={onSearch}
 				disabled={!canSearch}
-				className="w-full rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+				className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{isSearching ? (
 					<span className="flex items-center justify-center gap-2">
@@ -67,7 +67,17 @@ export function RouteInputForm({
 						検索中...
 					</span>
 				) : (
-					'検索'
+					<>
+						<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+							/>
+						</svg>
+						検索
+					</>
 				)}
 			</button>
 		</div>
