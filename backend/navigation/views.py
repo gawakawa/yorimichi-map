@@ -22,13 +22,17 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .serializers import (
+    CalculateRouteRequestSerializer,
+    CalculateRouteResponseSerializer,
     ChatRequestSerializer,
     ChatResponseSerializer,
     ReturnRouteRequestSerializer,
     ReturnRouteResponseSerializer,
+    WaypointSuggestRequestSerializer,
+    WaypointSuggestResponseSerializer,
 )
 from .services.deep_link import generate_google_maps_url
-from .services.gemini import send_message
+from .services.gemini import send_message, suggest_waypoints
 from .services.google_maps import calculate_route
 
 logger = logging.getLogger(__name__)
@@ -145,3 +149,101 @@ def return_route(request: Request) -> Response:
     route_data = _attach_deep_link(route_data)
 
     return Response(ReturnRouteResponseSerializer({"route": route_data}).data)
+
+
+@extend_schema(
+    summary="経由地候補提案",
+    description="AIが出発地・目的地・ユーザーの希望に基づき、経由地候補を3件提案する。",
+    request=WaypointSuggestRequestSerializer,
+    responses={
+        200: WaypointSuggestResponseSerializer,
+        429: OpenApiResponse(description="Too Many Requests"),
+        503: OpenApiResponse(description="Service Unavailable"),
+    },
+)
+@api_view(["POST"])
+def suggest_waypoints_view(request: Request) -> Response:
+    """経由地候補提案エンドポイント。
+
+    処理フロー:
+    1. リクエストから出発地・目的地・プロンプトを取得
+    2. Gemini に候補提案を依頼（JSON出力モード）
+    3. 候補3件とAIコメントを返却
+    """
+    serializer = WaypointSuggestRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    origin: str = serializer.validated_data["origin"]
+    destination: str = serializer.validated_data["destination"]
+    prompt: str = serializer.validated_data["prompt"]
+
+    try:
+        result = suggest_waypoints(origin, destination, prompt)
+    except Exception:
+        logger.exception("Gemini API call failed")
+        return Response(
+            {
+                "detail": "AIとの通信に失敗しました。しばらく待ってから再度お試しください。"
+            },
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    if "error" in result:
+        error_type = result.get("error")
+        if error_type == "rate_limit":
+            return Response(
+                {"detail": result.get("ai_comment", "レート制限に達しました。")},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+        return Response(
+            {"detail": result.get("ai_comment", "エラーが発生しました。")},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    return Response(WaypointSuggestResponseSerializer(result).data)
+
+
+@extend_schema(
+    summary="ルート計算",
+    description="出発地・目的地・経由地を指定してルートを計算する。AIは使用しない。",
+    request=CalculateRouteRequestSerializer,
+    responses={
+        200: CalculateRouteResponseSerializer,
+        400: OpenApiResponse(description="Bad Request"),
+        429: OpenApiResponse(description="Too Many Requests"),
+        502: OpenApiResponse(description="Bad Gateway"),
+    },
+)
+@api_view(["POST"])
+def calculate_route_view(request: Request) -> Response:
+    """ルート計算エンドポイント。
+
+    処理フロー:
+    1. リクエストから出発地・目的地・経由地を取得
+    2. Routes API でルート計算
+    3. Google Maps ディープリンクを付与して返却
+    """
+    serializer = CalculateRouteRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    origin: str = serializer.validated_data["origin"]
+    destination: str = serializer.validated_data["destination"]
+    waypoints: list[str] = serializer.validated_data.get("waypoints", [])
+
+    route_data = calculate_route(origin, destination, waypoints)
+
+    if "error" in route_data:
+        error_type = route_data.get("error_type", "api_failure")
+        http_status = (
+            status.HTTP_400_BAD_REQUEST
+            if error_type == "not_found"
+            else status.HTTP_502_BAD_GATEWAY
+        )
+        return Response(
+            {"detail": route_data["error"]},
+            status=http_status,
+        )
+
+    route_data = _attach_deep_link(route_data)
+
+    return Response(CalculateRouteResponseSerializer({"route": route_data}).data)

@@ -42,6 +42,28 @@ from . import google_maps
 
 logger = logging.getLogger(__name__)
 
+# 経由地候補提案用のシステムプロンプト
+WAYPOINT_SUGGEST_PROMPT = """\
+あなたはドライブの寄り道スポットを提案するAIです。
+出発地・目的地・ユーザーの希望に基づき、経由地候補を3つ提案してください。
+
+ルール:
+1. 出発地から目的地へのルート上、またはルートから大きく外れない範囲でスポットを選ぶこと
+2. ユーザーの希望に合致するスポットを選ぶこと
+3. 実在する施設・場所を提案すること
+4. 説明は50文字以内で簡潔に
+
+レスポンスは必ず以下のJSON形式で返してください:
+{
+  "candidates": [
+    {"name": "スポット名", "description": "50文字以内の説明", "address": "住所（わかれば）"},
+    {"name": "スポット名", "description": "50文字以内の説明", "address": "住所（わかれば）"},
+    {"name": "スポット名", "description": "50文字以内の説明", "address": "住所（わかれば）"}
+  ],
+  "ai_comment": "補足コメント（オプション）"
+}
+"""
+
 # Gemini に設定するシステムプロンプト。
 # AI がドライブコンシェルジュとして振る舞い、ツールを適切に使うよう指示する。
 SYSTEM_PROMPT = """\
@@ -295,3 +317,79 @@ def send_message(
     reply_text = response.text if response.text else ""
 
     return reply_text, route_data, places_data
+
+
+def suggest_waypoints(
+    origin: str,
+    destination: str,
+    prompt: str,
+) -> dict[str, Any]:
+    """AI に経由地候補を提案させる。
+
+    Function Calling を使わず、JSON 出力モードで候補を取得する。
+
+    Args:
+        origin: 出発地
+        destination: 目的地
+        prompt: ユーザーの寄り道リクエスト（例: 途中で温泉に寄りたい）
+
+    Returns:
+        {"candidates": [...], "ai_comment": "..."} 形式の辞書
+    """
+    import json
+
+    _ensure_initialized()
+
+    model = GenerativeModel(
+        "gemini-2.5-pro",
+        system_instruction=WAYPOINT_SUGGEST_PROMPT,
+        generation_config={"response_mime_type": "application/json"},
+    )
+
+    user_message = f"出発地: {origin}\n目的地: {destination}\nリクエスト: {prompt}"
+
+    max_retries = 3
+    response = None
+    for attempt in range(max_retries):
+        try:
+            response = model.generate_content(user_message)
+            break
+        except ResourceExhausted:
+            if attempt == max_retries - 1:
+                logger.exception(
+                    "Gemini rate limit exceeded after %d retries", max_retries
+                )
+                return {
+                    "candidates": [],
+                    "ai_comment": "サーバーが混み合っています。しばらく待ってから再度お試しください。",
+                    "error": "rate_limit",
+                }
+            wait_time = 2**attempt
+            logger.warning(
+                "Rate limited, retrying in %ds (attempt %d/%d)",
+                wait_time,
+                attempt + 1,
+                max_retries,
+            )
+            time.sleep(wait_time)
+
+    if response is None:
+        return {
+            "candidates": [],
+            "ai_comment": "予期しないエラーが発生しました。",
+            "error": "unexpected",
+        }
+
+    try:
+        result = json.loads(response.text)
+        return {
+            "candidates": result.get("candidates", []),
+            "ai_comment": result.get("ai_comment", ""),
+        }
+    except (json.JSONDecodeError, AttributeError):
+        logger.exception("Failed to parse Gemini JSON response")
+        return {
+            "candidates": [],
+            "ai_comment": "AIの応答を解析できませんでした。",
+            "error": "parse_error",
+        }

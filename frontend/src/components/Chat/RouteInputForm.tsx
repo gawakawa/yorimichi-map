@@ -1,8 +1,10 @@
 interface RouteInputFormProps {
 	origin: string;
 	destination: string;
+	aiPrompt?: string;
 	onOriginChange: (value: string) => void;
 	onDestinationChange: (value: string) => void;
+	onAiPromptChange?: (value: string) => void;
 	onSearch: () => void;
 	isSearching: boolean;
 }
@@ -10,8 +12,10 @@ interface RouteInputFormProps {
 export function RouteInputForm({
 	origin,
 	destination,
+	aiPrompt = '',
 	onOriginChange,
 	onDestinationChange,
+	onAiPromptChange,
 	onSearch,
 	isSearching,
 }: RouteInputFormProps) {
@@ -39,6 +43,18 @@ export function RouteInputForm({
 					className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
 				/>
 			</div>
+			{onAiPromptChange && (
+				<div className="flex items-start gap-2">
+					<span className="w-12 pt-2 text-sm text-gray-600">寄り道</span>
+					<textarea
+						value={aiPrompt}
+						onChange={(e) => onAiPromptChange(e.target.value)}
+						placeholder="寄り道リクエスト（任意）例: 途中で美味しいラーメンを食べたい"
+						rows={2}
+						className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+					/>
+				</div>
+			)}
 			<button
 				type="button"
 				onClick={onSearch}

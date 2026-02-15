@@ -110,3 +110,49 @@ class ReturnRouteResponseSerializer(serializers.Serializer):
     """POST /api/navigation/return-route/ のレスポンスボディ。"""
 
     route = RouteSerializer()
+
+
+# --- 経由地候補提案 ---
+
+
+class WaypointCandidateSerializer(serializers.Serializer):
+    """AI が提案する経由地候補1件。"""
+
+    name = serializers.CharField()
+    description = serializers.CharField()
+    address = serializers.CharField(required=False, allow_blank=True, default="")
+    coords = CoordsSerializer(required=False, allow_null=True, default=None)
+
+
+class WaypointSuggestRequestSerializer(serializers.Serializer):
+    """POST /api/navigation/suggest-waypoints/ のリクエストボディ。"""
+
+    origin = serializers.CharField(help_text="出発地")
+    destination = serializers.CharField(help_text="目的地")
+    prompt = serializers.CharField(help_text="寄り道リクエスト（例: 途中で温泉に寄りたい）")
+
+
+class WaypointSuggestResponseSerializer(serializers.Serializer):
+    """POST /api/navigation/suggest-waypoints/ のレスポンスボディ。"""
+
+    candidates = WaypointCandidateSerializer(many=True)
+    ai_comment = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class CalculateRouteRequestSerializer(serializers.Serializer):
+    """POST /api/navigation/calculate-route/ のリクエストボディ。"""
+
+    origin = serializers.CharField(help_text="出発地")
+    destination = serializers.CharField(help_text="目的地")
+    waypoints = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        default=[],
+        help_text="経由地のリスト",
+    )
+
+
+class CalculateRouteResponseSerializer(serializers.Serializer):
+    """POST /api/navigation/calculate-route/ のレスポンスボディ。"""
+
+    route = RouteSerializer()
