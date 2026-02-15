@@ -2,6 +2,8 @@
 
 **URL**: <https://yorimichi.i0ta.dev>
 
+**記事**: <https://zenn.dev/articles/ai-hackathon-yorimichi-map>
+
 - 寄り道スポットを含めた経路探索アプリ
 
 ## 特徴
