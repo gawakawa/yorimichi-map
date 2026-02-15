@@ -120,16 +120,6 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		}
 	};
 
-	// Reset route search
-	const handleReset = () => {
-		setRoute(null);
-		setWaypointCandidates([]);
-		setSelectedCandidates([]);
-		if (onRouteReceived) {
-			onRouteReceived(null);
-		}
-	};
-
 	return (
 		<div className="flex h-full flex-col">
 			{/* ヘッダー */}
@@ -194,69 +184,20 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 						</div>
 					)}
 
-					{/* Route result display */}
-					{route && (
-						<div className="mb-4 space-y-4">
-							<div className="rounded-lg border border-green-200 bg-green-50 p-4">
-								<h3 className="font-semibold text-green-800">ルートが見つかりました</h3>
-								<div className="mt-2 space-y-1 text-sm text-green-700">
-									<p>
-										<span className="font-medium">出発:</span> {route.origin}
-									</p>
-									<p>
-										<span className="font-medium">到着:</span> {route.destination}
-									</p>
-									{route.waypoints.length > 0 && (
-										<p>
-											<span className="font-medium">経由地:</span> {route.waypoints.join(' → ')}
-										</p>
-									)}
-									<p>
-										<span className="font-medium">距離:</span>{' '}
-										{(route.distance_meters / 1000).toFixed(1)} km
-									</p>
-									<p>
-										<span className="font-medium">所要時間:</span>{' '}
-										{Math.round(parseInt(route.duration_seconds) / 60)} 分
-									</p>
-								</div>
-								<div className="mt-4 flex gap-2">
-									<a
-										href={route.google_maps_url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex-1 rounded-lg bg-blue-500 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-blue-600"
-									>
-										Google Maps で開く
-									</a>
-									<button
-										type="button"
-										onClick={handleReset}
-										className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-									>
-										新規検索
-									</button>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Route input form (always visible when no route result) */}
-					{!route && (
-						<div className="mb-4">
-							<RouteInputForm
-								origin={origin}
-								destination={destination}
-								onOriginChange={setOrigin}
-								onDestinationChange={setDestination}
-								onSearch={handleRouteSearch}
-								isSearching={isSearchingRoute}
-							/>
-						</div>
-					)}
+					{/* Route input form */}
+					<div className="mb-4">
+						<RouteInputForm
+							origin={origin}
+							destination={destination}
+							onOriginChange={setOrigin}
+							onDestinationChange={setDestination}
+							onSearch={handleRouteSearch}
+							isSearching={isSearchingRoute}
+						/>
+					</div>
 
 					{/* Waypoint candidates display */}
-					{!route && waypointCandidates.length > 0 && (
+					{waypointCandidates.length > 0 && (
 						<div className="mb-4">
 							<WaypointCandidatesList
 								candidates={waypointCandidates}
@@ -286,26 +227,22 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 					)}
 
 					{/* Chat messages */}
-					{!route && (
-						<>
-							<MessageList messages={messages} />
+					<MessageList messages={messages} />
 
-							{isLoading && (
-								<div
-									className="flex flex-col items-center justify-center py-8"
-									aria-live="polite"
-									aria-label="読み込み中"
-								>
-									<div className="relative">
-										<div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-transparent bg-gradient-to-br from-blue-500 to-purple-600" />
-										<div className="absolute inset-0 flex items-center justify-center">
-											<div className="h-6 w-6 rounded-full bg-white" />
-										</div>
-									</div>
-									<p className="mt-4 text-sm font-medium text-gray-600">考え中...</p>
+					{isLoading && (
+						<div
+							className="flex flex-col items-center justify-center py-8"
+							aria-live="polite"
+							aria-label="読み込み中"
+						>
+							<div className="relative">
+								<div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-transparent bg-gradient-to-br from-blue-500 to-purple-600" />
+								<div className="absolute inset-0 flex items-center justify-center">
+									<div className="h-6 w-6 rounded-full bg-white" />
 								</div>
-							)}
-						</>
+							</div>
+							<p className="mt-4 text-sm font-medium text-gray-600">考え中...</p>
+						</div>
 					)}
 
 					{/* Auto-scroll anchor */}
@@ -313,16 +250,14 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 				</div>
 			</div>
 
-			{/* Chat input (visible when no route result) */}
-			{!route && (
-				<div className="flex-shrink-0">
-					<ChatInput
-						onSend={handleSend}
-						isLoading={isLoading}
-						disabled={!origin.trim() || !destination.trim()}
-					/>
-				</div>
-			)}
+			{/* Chat input */}
+			<div className="flex-shrink-0">
+				<ChatInput
+					onSend={handleSend}
+					isLoading={isLoading}
+					disabled={!origin.trim() || !destination.trim()}
+				/>
+			</div>
 		</div>
 	);
 }

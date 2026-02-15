@@ -2,9 +2,12 @@ import { formatDistance, formatDuration } from '../../utils/format';
 import { ActionButtons } from './ActionButtons';
 
 interface RouteSummaryProps {
+	origin?: string;
+	destination?: string;
 	distance?: number;
 	duration?: number;
 	waypoints?: string[];
+	googleMapsUrl?: string;
 	title?: string;
 	onSearch?: () => void;
 	onDetails?: () => void;
@@ -12,9 +15,12 @@ interface RouteSummaryProps {
 }
 
 export function RouteSummary({
+	origin,
+	destination,
 	distance = 2500,
 	duration = 900,
 	waypoints = [],
+	googleMapsUrl,
 	title = 'おすすめルート',
 	onSearch = () => {
 		// TODO: 検索処理を実装
@@ -47,6 +53,21 @@ export function RouteSummary({
 					</div>
 					<h3 className="text-lg font-bold text-gray-800">{title}</h3>
 				</div>
+
+				{(origin || destination) && (
+					<div className="mb-3 space-y-1 text-sm text-gray-700">
+						{origin && (
+							<p>
+								<span className="font-medium">出発:</span> {origin}
+							</p>
+						)}
+						{destination && (
+							<p>
+								<span className="font-medium">到着:</span> {destination}
+							</p>
+						)}
+					</div>
+				)}
 
 				<div className="space-y-3">
 					<div className="flex items-center justify-between rounded-lg bg-white/60 px-4 py-3">
@@ -112,6 +133,17 @@ export function RouteSummary({
 					)}
 				</div>
 			</div>
+
+			{googleMapsUrl && (
+				<a
+					href={googleMapsUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="block w-full rounded-lg bg-blue-500 px-4 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-blue-600"
+				>
+					Google Maps で開く
+				</a>
+			)}
 
 			<ActionButtons onSearch={onSearch} onDetails={onDetails} onShare={onShare} />
 		</div>

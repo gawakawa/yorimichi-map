@@ -12,9 +12,12 @@ export function MapPanel({ route }: MapPanelProps) {
 			{route && (
 				<div className="border-b border-gray-200 bg-white p-5 shadow-sm">
 					<RouteSummary
+						origin={route.origin}
+						destination={route.destination}
 						distance={route.distance_meters}
 						duration={parseInt(route.duration_seconds, 10)}
 						waypoints={route.waypoints}
+						googleMapsUrl={route.google_maps_url}
 					/>
 				</div>
 			)}
