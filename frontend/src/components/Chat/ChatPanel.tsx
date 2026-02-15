@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useChat } from '../../hooks/useChat';
-import { chatNavigationAPI, type Route, type WaypointCandidate } from '../../api/navigation';
+import { useWaypointManager } from '../../hooks/useWaypointManager';
+import { chatNavigationAPI, type Route } from '../../api/navigation';
 import { APIError } from '../../api/errors';
 import { getErrorMessage } from '../../utils/errorMessages';
 import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 import { WaypointCandidatesList } from './WaypointCandidatesList';
+import { ConfirmedWaypointsList } from './ConfirmedWaypointsList';
 import { RouteInputForm } from './RouteInputForm';
 
 interface ChatPanelProps {
@@ -22,9 +24,17 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 	const [isSearchingRoute, setIsSearchingRoute] = useState(false);
 	const [route, setRoute] = useState<Route | null>(null);
 
-	// Waypoint candidates state
-	const [waypointCandidates, setWaypointCandidates] = useState<WaypointCandidate[]>([]);
-	const [selectedCandidates, setSelectedCandidates] = useState<WaypointCandidate[]>([]);
+	// Waypoint manager
+	const {
+		confirmedWaypoints,
+		candidates: waypointCandidates,
+		selectedCandidates,
+		setCandidates,
+		toggleSelection,
+		confirmSelection,
+		removeConfirmedWaypoint,
+		getAllWaypointNames,
+	} = useWaypointManager();
 
 	// Notify parent when route is received
 	useEffect(() => {
@@ -42,8 +52,7 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		addMessage(message, 'user');
 		setErrorMessage(null);
 		setLoading(true);
-		setWaypointCandidates([]);
-		setSelectedCandidates([]);
+		setCandidates([]);
 
 		try {
 			const response = await chatNavigationAPI.suggestWaypoints({
@@ -57,7 +66,7 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 			}
 
 			if (response.candidates && response.candidates.length > 0) {
-				setWaypointCandidates(response.candidates);
+				setCandidates(response.candidates);
 			}
 		} catch (err) {
 			console.error('Failed to suggest waypoints:', err);
@@ -77,18 +86,12 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		}
 	};
 
-	// Handle candidate selection
-	const handleCandidateSelect = (candidate: WaypointCandidate) => {
-		setSelectedCandidates((prev) => {
-			const exists = prev.some((c) => c.name === candidate.name);
-			if (exists) {
-				return prev.filter((c) => c.name !== candidate.name);
-			}
-			return [...prev, candidate];
-		});
+	// Handle adding waypoints (confirmation only, no route search)
+	const handleConfirmWaypoints = () => {
+		confirmSelection();
 	};
 
-	// Calculate route with selected candidates
+	// Calculate route with confirmed waypoints
 	const handleRouteSearch = async () => {
 		if (origin.trim() === '' || destination.trim() === '') {
 			setErrorMessage('出発地と目的地を入力してください');
@@ -99,15 +102,13 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 		setErrorMessage(null);
 
 		try {
-			const waypoints = selectedCandidates.map((c) => c.name);
+			const waypoints = getAllWaypointNames();
 			const response = await chatNavigationAPI.calculateRoute({
 				origin: origin.trim(),
 				destination: destination.trim(),
 				waypoints,
 			});
 			setRoute(response.route);
-			setWaypointCandidates([]);
-			setSelectedCandidates([]);
 		} catch (err) {
 			console.error('Route calculation failed:', err);
 			if (err instanceof APIError) {
@@ -196,15 +197,24 @@ export function ChatPanel({ onRouteReceived }: ChatPanelProps) {
 						/>
 					</div>
 
+					{/* Confirmed waypoints display */}
+					{confirmedWaypoints.length > 0 && (
+						<div className="mb-4">
+							<ConfirmedWaypointsList
+								waypoints={confirmedWaypoints}
+								onRemove={removeConfirmedWaypoint}
+							/>
+						</div>
+					)}
+
 					{/* Waypoint candidates display */}
 					{waypointCandidates.length > 0 && (
 						<div className="mb-4">
 							<WaypointCandidatesList
 								candidates={waypointCandidates}
 								selectedCandidates={selectedCandidates}
-								onSelect={handleCandidateSelect}
-								onConfirm={handleRouteSearch}
-								isSearching={isSearchingRoute}
+								onSelect={toggleSelection}
+								onConfirm={handleConfirmWaypoints}
 							/>
 						</div>
 					)}

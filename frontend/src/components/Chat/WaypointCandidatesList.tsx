@@ -5,7 +5,6 @@ interface WaypointCandidatesListProps {
   selectedCandidates: WaypointCandidate[];
   onSelect: (candidate: WaypointCandidate) => void;
   onConfirm: () => void;
-  isSearching: boolean;
 }
 
 export function WaypointCandidatesList({
@@ -13,7 +12,6 @@ export function WaypointCandidatesList({
   selectedCandidates,
   onSelect,
   onConfirm,
-  isSearching,
 }: WaypointCandidatesListProps) {
   const isSelected = (candidate: WaypointCandidate) =>
     selectedCandidates.some((c) => c.name === candidate.name);
@@ -21,7 +19,7 @@ export function WaypointCandidatesList({
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-gray-700">
-        経由地の候補 ({selectedCandidates.length}件選択中)
+        寄り道の候補 ({selectedCandidates.length}件選択中)
       </h3>
       <div className="space-y-2">
         {candidates.map((candidate) => {
@@ -68,36 +66,10 @@ export function WaypointCandidatesList({
       <button
         type="button"
         onClick={onConfirm}
-        disabled={selectedCandidates.length === 0 || isSearching}
+        disabled={selectedCandidates.length === 0}
         className="w-full rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300 disabled:opacity-50"
       >
-        {isSearching ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg
-              className="h-4 w-4 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            ルート検索中...
-          </span>
-        ) : (
-          'このルートで検索'
-        )}
+        寄り道を追加
       </button>
     </div>
   );

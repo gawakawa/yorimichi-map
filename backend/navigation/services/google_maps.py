@@ -150,7 +150,8 @@ def calculate_route(
             "routes.distanceMeters,"
             "routes.travelAdvisory.tollInfo,"
             "routes.polyline.encodedPolyline,"
-            "routes.legs.endLocation"
+            "routes.legs.endLocation,"
+            "routes.optimizedIntermediateWaypointIndex"
         ),
     }
 
@@ -175,6 +176,7 @@ def calculate_route(
 
     if intermediates:
         payload["intermediates"] = intermediates
+        payload["optimizeWaypointOrder"] = True
 
     try:
         response = requests.post(
@@ -212,6 +214,11 @@ def calculate_route(
         }
 
     route = routes[0]
+
+    # 最適化された経由地順序を適用
+    optimized_indices = route.get("optimizedIntermediateWaypointIndex", [])
+    if waypoints and optimized_indices:
+        waypoints = [waypoints[i] for i in optimized_indices]
 
     # 高速道路料金を取り出す
     tolls: list[dict[str, str]] = []

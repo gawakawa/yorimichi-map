@@ -211,10 +211,11 @@ class TestCalculateRoute:
         assert "error" not in result
         assert result["waypoints"] == ["小田原駅"]
 
-        # intermediates がリクエストに含まれていること
+        # intermediates と optimizeWaypointOrder がリクエストに含まれていること
         call_kwargs = mock_post.call_args
         payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
         assert payload["intermediates"] == [{"address": "小田原駅"}]
+        assert payload["optimizeWaypointOrder"] is True
 
     def test_no_api_key(self) -> None:
         """MAPS_API_KEY が未設定の場合、エラー辞書を返すこと。"""
@@ -337,6 +338,56 @@ class TestCalculateRoute:
             "latitude": 35.2074,
             "longitude": 139.1028,
         }
+
+    @patch("navigation.services.google_maps.requests.post")
+    def test_optimized_waypoint_order(self, mock_post: Mock) -> None:
+        """経由地が最適化された順序で返されること。"""
+        mock_response = Mock()
+        mock_response.raise_for_status = Mock()
+        mock_response.json.return_value = {
+            "routes": [
+                {
+                    "duration": "10800s",
+                    "distanceMeters": 150000,
+                    "polyline": {"encodedPolyline": "opt123"},
+                    # API returns optimized order: [1, 0, 2] means B, A, C
+                    "optimizedIntermediateWaypointIndex": [1, 0, 2],
+                    "legs": [
+                        {
+                            "endLocation": {
+                                "latLng": {"latitude": 35.1, "longitude": 139.1}
+                            }
+                        },
+                        {
+                            "endLocation": {
+                                "latLng": {"latitude": 35.2, "longitude": 139.2}
+                            }
+                        },
+                        {
+                            "endLocation": {
+                                "latLng": {"latitude": 35.3, "longitude": 139.3}
+                            }
+                        },
+                        {
+                            "endLocation": {
+                                "latLng": {"latitude": 35.4, "longitude": 139.4}
+                            }
+                        },
+                    ],
+                }
+            ]
+        }
+        mock_post.return_value = mock_response
+
+        settings.MAPS_API_KEY = "test-api-key"
+        result = calculate_route(
+            "東京駅", "箱根湯本駅", waypoints=["A地点", "B地点", "C地点"]
+        )
+
+        assert "error" not in result
+        # Original order: [A, B, C] -> Optimized order: [B, A, C]
+        assert result["waypoints"] == ["B地点", "A地点", "C地点"]
+        assert len(result["waypoint_coords"]) == 3
 
     @patch("navigation.services.google_maps.requests.post")
     def test_no_waypoints_returns_empty_coords(self, mock_post: Mock) -> None:
