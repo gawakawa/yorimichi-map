@@ -28,6 +28,7 @@ interface RouteMapProps {
 
 export function RouteMap({ route }: RouteMapProps) {
 	const routePoints = route ? decodePolyline(route.encoded_polyline) : [];
+
 	const hasRoute = routePoints.length > 0;
 
 	const startPoint = hasRoute ? routePoints[0] : null;
