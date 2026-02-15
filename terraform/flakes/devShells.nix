@@ -10,7 +10,21 @@
     let
       mcpConfig = inputs.mcp-servers-nix.lib.mkConfig (import inputs.mcp-servers-nix.inputs.nixpkgs {
         inherit system;
-      }) { programs.terraform.enable = true; };
+      }) {
+        programs.terraform.enable = true;
+        settings.servers = {
+          drawio-diagrams = {
+            command = "${pkgs.lib.getExe' pkgs.nodejs_20 "npx"}";
+            args = [
+              "-y"
+              "drawio-mcp"
+            ];
+            env = {
+              PATH = "${pkgs.nodejs_20}/bin:/usr/bin:/bin";
+            };
+          };
+        };
+      };
 
       devPackages =
         config.pre-commit.settings.enabledPackages
