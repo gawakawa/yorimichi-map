@@ -1,6 +1,6 @@
 # 寄り道マップ
 
-**URL**: <https://yorimichi.i0ta.dev>
+**URL**: <https://yorimichi.i0ta.dev> (現在GCPリソースは削除済み)
 
 **記事**: <https://zenn.dev/iota/articles/ai-hackathon-yorimichi-map>
 
