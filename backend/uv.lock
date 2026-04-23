@@ -349,7 +349,7 @@ requests = [
 
 [[package]]
 name = "google-cloud-aiplatform"
-version = "1.146.0"
+version = "1.148.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
@@ -365,9 +365,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/c6/9d49d51e47dfa656b32dbce83d0b064d211407f11edf1d3d5dbc28ef03d1/google_cloud_aiplatform-1.146.0.tar.gz", hash = "sha256:3b95bc6c5a49b1341153b6e20c2d6139fde76a908c335116222db3bd496c4b51", size = 10226053, upload-time = "2026-04-08T01:39:08.155Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/5f/4d7c5e1e35f1a514e7f23882cf68738c5ef96d12a74383e6d008e698d207/google_cloud_aiplatform-1.148.0.tar.gz", hash = "sha256:86a736a6a90cb97d17b51c8a973cda474ca9ace44ee00a2da96f8e60e6c6d5df", size = 10275203, upload-time = "2026-04-15T02:35:09.001Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/f3/8420d26f0a340c69582b6d6f6b9937d58c1a32c9a9496e6a1c45e9c8ba3b/google_cloud_aiplatform-1.146.0-py2.py3-none-any.whl", hash = "sha256:bd1912841905c2c7b49cc65726aaa1c0cc41df8474ca427d2f8af09bb72c0e3d", size = 8400991, upload-time = "2026-04-08T01:39:04.341Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/f7/f3af0f8b4cee02be64e1f3dede9219b0624f95d788ad334971f5269ed35d/google_cloud_aiplatform-1.148.0-py2.py3-none-any.whl", hash = "sha256:0c4a20e7f096e9a5a3cecc90ba3b67ce27f94afdf089cd9b3a738ff5af2f3b00", size = 8433269, upload-time = "2026-04-15T02:35:05.594Z" },
 ]
 
 [[package]]
@@ -1221,7 +1221,7 @@ requires-dist = [
     { name = "django-cors-headers", specifier = ">=4.9.0" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
     { name = "drf-spectacular", specifier = ">=0.29.0" },
-    { name = "google-cloud-aiplatform", specifier = ">=1.146.0" },
+    { name = "google-cloud-aiplatform", specifier = ">=1.148.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "requests", specifier = ">=2.32.5" },
