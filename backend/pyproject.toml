@@ -12,7 +12,7 @@ dependencies = [
     "google-cloud-aiplatform>=1.152.0",
     "gunicorn>=23.0.0",
     "python-dotenv>=1.2.1",
-    "requests>=2.32.5",
+    "requests>=2.34.1",
 ]
 
 [tool.setuptools.packages.find]
