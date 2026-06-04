@@ -10,7 +10,7 @@ dependencies = [
     "djangorestframework>=3.16.1",
     "drf-spectacular>=0.29.0",
     "google-cloud-aiplatform>=1.153.1",
-    "gunicorn>=23.0.0",
+    "gunicorn>=26.0.0",
     "python-dotenv>=1.2.1",
     "requests>=2.34.2",
 ]
