@@ -21,7 +21,7 @@ include = ["yorimichi_map_backend*", "navigation*"]
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
-    "ty>=0.0.40",
+    "ty>=0.0.44",
 ]
 
 [tool.pytest.ini_options]
