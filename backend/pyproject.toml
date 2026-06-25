@@ -20,7 +20,7 @@ include = ["yorimichi_map_backend*", "navigation*"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.3",
+    "pytest>=9.1.0",
     "ty>=0.0.49",
 ]
 
